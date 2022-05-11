@@ -116,3 +116,25 @@ function pdf(pensemble::Pseudoensemble, y::Vector{<:Real})
     
 end
 
+"""
+    showpseudoensemble(io::IO, obj::Pseudoensemble; prefix::String = "")
+
+Displays a Pseudoensemble with the prefix `prefix` before every line.
+"""
+function showpseudoensemble(io::IO, obj::Pseudoensemble; prefix::String = "")
+
+    println(io, prefix, "Pseudoensemble:")
+    println(io, prefix, "  name: ", obj.name)
+    println(io, prefix, "  value: ", typeof(pensemble.value), "[", length(obj.value), "]")
+end
+
+"""
+    Base.show(io::IO, obj::Pseudoensemble)
+
+Override of the show function for the objects of type Pseudoensemble.
+"""
+function Base.show(io::IO, obj::Pseudoensemble)
+
+    showpseudoensemble(io, obj)
+
+end

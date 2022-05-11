@@ -46,3 +46,28 @@ function pdf(pdata::Pseudodata, y::Vector{<:Real})
     return pdf.(pd, y)
     
 end   
+
+"""
+    showpseudodata(io::IO, obj::Pseudodata; prefix::String = "")
+
+Displays a Pseudodata with the prefix `prefix` before every line.
+"""
+function showpseudodata(io::IO, obj::Pseudodata; prefix::String = "")
+
+    println(io, prefix, "Pseudodata:")
+    println(io, prefix, "  name: ", obj.name)
+    println(io, prefix, "  year: ", typeof(obj.year), "[", length(obj.year), "]")
+    println(io, prefix, "  value:", typeof(obj.value), "[", length(obj.value), "]")
+
+end
+
+"""
+    Base.show(io::IO, obj::Pseudodata)
+
+Override of the show function for the objects of type Pseudodata.
+"""
+function Base.show(io::IO, obj::Pseudodata)
+
+    showpseudodata(io, obj)
+
+end

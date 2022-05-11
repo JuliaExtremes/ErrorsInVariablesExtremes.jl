@@ -9,7 +9,6 @@ Load the discharge distribution from the NetCDF file `filename`.
 
 For each configuration of the hydrological model, the function loads the 21 quantiles and transforms them into a Log-normal distribution. The data are encapsulated in the `Pseudo set` structure.
 """
-
 function load_discharge_distribution(filename::String)
 
     
