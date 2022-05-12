@@ -30,8 +30,5 @@ function showPseudoMaximaEVA(io::IO, obj::PseudoMaximaEVA; prefix::String = "")
     show(io::IO, obj.model)
     println(io::IO, "")
     Extremes.showChain(io::IO, obj.sim)
-    
-#     println(io, prefix, "Pseudoensemble:")
-#     println(io, prefix, "  name: ", obj.name)
-#     println(io, prefix, "  value: ", typeof(pensemble.value), "[", length(obj.value), "]")
+
 end

@@ -293,7 +293,7 @@ function showpseudoensemble(io::IO, obj::Pseudoensemble; prefix::String = "")
 
     println(io, prefix, "Pseudoensemble:")
     println(io, prefix, "  name: ", obj.name)
-    println(io, prefix, "  value: ", typeof(pensemble.value), "[", length(obj.value), "]")
+    println(io, prefix, "  value: ", typeof(obj.value), "[", length(obj.value), "]")
 end
 
 """
