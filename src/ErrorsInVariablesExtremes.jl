@@ -15,7 +15,7 @@ include("parameterestimation.jl")
 export 
 
     # Pseudodata type
-    Pseudodata, Pseudoensemble, PseudoMaximaEVA
+    Pseudodata, Pseudoensemble, PseudoMaximaEVA,
 
     # Other functions
     convert,
