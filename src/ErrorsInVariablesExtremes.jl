@@ -2,10 +2,7 @@ module ErrorsInVariablesExtremes
 
 using CSV, DataFrames, Dates, NetCDF
 using Distributions, Extremes, LinearAlgebra, Mamba, Random, Statistics
-using Gadfly
 using ProgressMeter
-
-using Test
 
 import Base.convert
 import Distributions.pdf, Distributions.logpdf
