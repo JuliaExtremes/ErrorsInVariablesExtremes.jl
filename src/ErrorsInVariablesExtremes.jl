@@ -20,7 +20,7 @@ export
     # Other functions
     convert,
     ensemblemean,
-    gevfit,
+    gevfitbayes,
     load_discharge_distribution,
     logpdf,
     pdf
