@@ -52,3 +52,17 @@ function load_discharge_distribution(filename::String)
     return pensemble
 
 end
+
+"""
+    update_stepsize(δ::Real, accrate::Real)
+
+Update of the random walk step size for the Metropolis-Hastings algorithm
+
+#### Details
+
+#TODO : See Rosenthal ...
+"""
+function update_stepsize(δ::Real, accrate::Real)
+    Δδ = 0.01 * (2 * (accrate > 0.44) - 1)
+    return δ * exp(Δδ)
+end
