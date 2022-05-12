@@ -15,14 +15,12 @@ include("parameterestimation.jl")
 export 
 
     # Pseudodata type
-    Pseudodata,
-
-    # Pseudoensemble type
-    Pseudoensemble,
+    Pseudodata, Pseudoensemble, PseudoMaximaEVA
 
     # Other functions
     convert,
     ensemblemean,
+    gevfit,
     load_discharge_distribution,
     logpdf,
     pdf
