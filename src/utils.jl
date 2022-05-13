@@ -54,6 +54,24 @@ function load_discharge_distribution(filename::String)
 end
 
 """
+    quantile2gaussian(x::Vector{<:Real}, p::Vector{<:Real})
+
+Determine the Normal distribution with `Φ(x[1]) = p[1]` and `Φ(x[2]) = p[2]`.
+"""
+function quantile2gaussian(x::Vector{<:Real}, p::Vector{<:Real})
+   
+    @assert length(x) == length(p) "The size of the quantiles vector must match the size of the probability vector."
+    @assert length(unique(p)) == 2 "Two unique quantiles are required to determine the Normal distribution."
+    
+    σ = (x[2] - x[1]) / (quantile(Normal(), p[2]) - quantile(Normal(), p[1]))
+    
+    μ = ( x[1]*quantile(Normal(),p[2]) - x[2]*quantile(Normal(),p[1]) ) / ( quantile(Normal(), p[2]) - quantile(Normal(), p[1]) )
+    
+    return Normal(μ, σ)
+    
+end
+
+"""
     update_stepsize(δ::Real, accrate::Real)
 
 Update of the random walk step size for the Metropolis-Hastings algorithm
