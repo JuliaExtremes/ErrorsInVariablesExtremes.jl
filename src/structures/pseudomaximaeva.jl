@@ -12,8 +12,8 @@ Encapsulates the probability distributions for each of the unobserved data for a
 """
 struct PseudoMaximaEVA
     pseudodata::Pseudoensemble
-    model::EVA
-    sim::Mamba.Chains
+    parameters::fittedEVA
+    maxima::Mamba.Chains
 end
 
 
@@ -25,10 +25,12 @@ end
 
 function showPseudoMaximaEVA(io::IO, obj::PseudoMaximaEVA; prefix::String = "")
 
-    show(io::IO, obj.pseudodata)
+    show(io::IO, obj.pseudodata, prefix ="  ")
     println(io::IO, "")
-    show(io::IO, obj.model)
+    println(io::IO, "parameters:")
+    Extremes.showfittedEVA(io::IO, obj.parameters; prefix="  ")
     println(io::IO, "")
-    Extremes.showChain(io::IO, obj.sim)
+    println(io::IO, "maxima:")
+    Extremes.showChain(io::IO, obj.maxima, prefix="  ")
 
 end
