@@ -201,7 +201,7 @@ function gevfitbayes(pdata::Pseudoensemble;
 
     C = Mamba.Chains(collect(params'), names=paramnames)
 
-    ŷ = vec(mean(Y[:, warmup:niter], dims=2))
+    ŷ = vec(mean(Y[:, warmup:thin:niter], dims=2))
 
     data_layer = BlockMaxima(Variable("ŷ", ŷ),
             locationcov = locationcov, 
@@ -214,7 +214,7 @@ function gevfitbayes(pdata::Pseudoensemble;
 
     CM = Mamba.Chains(collect(Y'), names=M_names)
 
-    return PseudoMaximaEVA(pdata, fm, CM[warmup:thin:niter, :,:] )
+    return PseudoMaximaEVA(pdata, fm, CM[warmup:thin:niter, :,:])
 
 end
 
