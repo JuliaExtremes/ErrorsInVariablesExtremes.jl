@@ -23,6 +23,7 @@ export
     gevfitbayes,
     load_discharge_distribution,
     logpdf,
-    pdf
+    pdf,
+    get_DIC
 
 end # module
