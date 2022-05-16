@@ -1,4 +1,4 @@
-using DataFrames, Dates
+using DataFrames, Dates, NetCDF
 using Distributions, ErrorsInVariablesExtremes
 using Test
 using LinearAlgebra, Random
@@ -10,4 +10,5 @@ Random.seed!(12)
 
 @testset "ErrorsInVariablesExtremes.jl" begin
     include("structures_test.jl")
+    include("utils_test.jl")
 end;
