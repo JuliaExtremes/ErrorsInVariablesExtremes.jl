@@ -208,7 +208,7 @@ function gevfitbayes(pdata::Pseudoensemble;
             logscalecov = logscalecov,
             shapecov = shapecov)
 
-    fm = BayesianEVA(data_layer, C[warmup+1:thin:niter, :, :])
+    fm = BayesianEVA(data_layer, C[warmup:thin:niter, :, :])
 
     M_names = ["Y[$j]" for j = 1:n]
 
