@@ -8,8 +8,8 @@ import Base.convert
 import Distributions.pdf, Distributions.logpdf
 import Extremes.gevfitbayes
 
-include("utils.jl")
 include("structures.jl")
+include("utils.jl")
 include("parameterestimation.jl")
 
 export 
