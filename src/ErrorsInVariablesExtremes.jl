@@ -10,7 +10,6 @@ import Extremes.gevfitbayes
 
 include("structures.jl")
 include("utils.jl")
-include("parameterestimation.jl")
 
 export 
 
