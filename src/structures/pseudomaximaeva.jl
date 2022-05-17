@@ -36,37 +36,28 @@ function showPseudoMaximaEVA(io::IO, obj::PseudoMaximaEVA; prefix::String = "")
 end
 
 """
-    get_DIC(fm::PseudoMaximaEVA)
+    dic(fm::PseudoMaximaEVA)
 
-Compute the Deviance Information Criterion (DIC).
+Compute the Deviance Information Criterion (DIC) described by Gelman et al. (2013) for the PseudoMaximaEVA model `fm`.
 
 #### Details
 
-#TODO : See Spiegelhalter et al. (2002) ...
-
+Reference:
+Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A. & Rubin, D.B. (2013). *Bayesian Data Analysis (3rd ed.)*. Chapman and Hall/CRC. https://doi.org/10.1201/b16018
 """
-function get_DIC(fm::PseudoMaximaEVA)
+function dic(fm::PseudoMaximaEVA)
+   
+    Davg = mean(loglike(fm))
     
-    y = fm.maxima.value[:, :, 1]
-    ȳ = vec(mean(y, dims = 1))
-
-    v = fm.parameters.sim.value[:,:,1]
-    V = Extremes.slicematrix(v, dims=2)
-    V̄ = vec(mean(V, dims = 1))
-
-    D = Extremes.getdistribution.(fm.parameters.model, V̄)
-    d = Extremes.unslicematrix(D, dims=2)
-
-    DIC₁ = sum(logpdf(fm.pseudodata, ȳ)) + sum(logpdf.(d, ȳ))
+    θ̂ = vec(mean(fm.parameters.sim.value, dims=1))
+    ŷ = vec(mean(fm.maxima.value, dims=1))
     
-    DIC₂ = 0.0
-    for s in 1:length(fm.pseudodata.value)
-        DIC₂ += sum(mean(logpdf.(Ref(fm.pseudodata), y, Ref(s)), dims=1))
-    end
-    DIC₂ += sum(mean(logpdf.(Extremes.getdistribution(fm.parameters), y), dims=1))
-
-    return -2 * DIC₂ + DIC₁
+    D = loglike(fm, ŷ, θ̂) 
+    
+    return 2*Davg - D
+        
 end
+
 
 """
     function loglike(fm::PseudoMaximaEVA)
