@@ -67,3 +67,52 @@ function get_DIC(fm::PseudoMaximaEVA)
 
     return -2 * DIC₂ + DIC₁
 end
+
+"""
+    function loglike(fm::PseudoMaximaEVA)
+
+Compute the loglikelihood of the ErrorsInVariables extreme value model `fm` for all MCMC iterations.
+"""
+function loglike(fm::PseudoMaximaEVA)
+    
+    # Number of MCMC simulations
+    nsim = size(fm.parameters.sim.value, 1)
+    
+    # Preallocating the vector
+    ll = Vector{Float64}(undef, nsim)
+    
+    for k in 1:nsim
+    
+        y = vec(fm.maxima.value[k, :, 1])
+        θ̂ = vec(fm.parameters.sim.value[k,:,1])
+        
+        ll[k] = loglike(fm, y, θ̂)
+    
+    end
+    
+    return ll
+    
+end
+
+"""
+    function loglike(fm::PseudoMaximaEVA, y::Vector{<:Real}, θ::AbstractVector{<:Real})
+
+Compute the loglikelihood of the ErrorsInVariables extreme value model `fm` given the maxima `y` and the GEV parameters `θ`.
+"""
+function loglike(fm::PseudoMaximaEVA, y::Vector{<:Real}, θ::AbstractVector{<:Real})
+    
+    # Reconstruct the BlockMaxima structure with the data y
+    model = BlockMaxima(Variable("y", y),
+        locationcov = fm.parameters.model.location.covariate,
+        logscalecov = fm.parameters.model.logscale.covariate,
+        shapecov = fm.parameters.model.shape.covariate)
+    
+    # Evaluate the loglikelihood knowing the maxima
+    ℓ₁ = Extremes.loglike(model, θ)
+    
+    # Evaluate the loglikelihood of the maxima
+    ℓ₂ = sum(logpdf(fm.pseudodata, y))
+    
+    return ℓ₁ + ℓ₂
+    
+end
