@@ -6,7 +6,7 @@ using ProgressMeter
 
 import Base.convert
 import Distributions.pdf, Distributions.logpdf
-import Extremes.fitbayes, Extremes.gevfitbayes, Extremes.loglike, Extremes.paramfun
+import Extremes.fitbayes, Extremes.loglike, Extremes.paramfun
 import Mamba.dic
 
 include("structures.jl")
@@ -21,7 +21,7 @@ export
     convert,
     dic,
     ensemblemean,
-    gevfitbayes,
+    fitbayes,
     load_discharge_distribution,
     logpdf,
     loglike,
