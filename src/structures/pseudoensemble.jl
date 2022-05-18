@@ -52,7 +52,7 @@ function gevfitbayes(pdata::Pseudoensemble;
     locationcov::Vector{<:DataItem} = Vector{Variable}(),
     logscalecov::Vector{<:DataItem} = Vector{Variable}(),
     shapecov::Vector{<:DataItem} = Vector{Variable}(),
-    prior::Vector{ContinuousUnivariateDistribution} = Vector{ContinuousUnivariateDistribution}(),
+    prior::Vector{<:ContinuousUnivariateDistribution} = Vector{ContinuousUnivariateDistribution}(),
     δₒ::Real=0,
     δ::Vector{<:Real}=Float64[],
     warmup::Int=10000,
@@ -92,10 +92,11 @@ function gevfitbayes(pdata::Pseudoensemble;
     acc_y = falses(n, niter)
     acc = falses(Extremes.nparameter(data_layer), niter)
 
+    parindex = Extremes.paramindex(data_layer)
+
     if isempty(prior)
         prior = Vector{ContinuousUnivariateDistribution}(undef, Extremes.nparameter(data_layer))
 
-        parindex = Extremes.paramindex(data_layer)
         prior[parindex[:μ]] .= Flat()
         prior[parindex[:ϕ]] .= Flat()
         prior[parindex[:ξ]] .= LocationScale(-.5, 1, Beta(6,9))

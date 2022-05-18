@@ -1,5 +1,5 @@
 using DataFrames, Dates, NetCDF
-using Distributions, ErrorsInVariablesExtremes
+using Distributions, ErrorsInVariablesExtremes, Extremes
 using Test
 using LinearAlgebra, Random
 using Mamba
