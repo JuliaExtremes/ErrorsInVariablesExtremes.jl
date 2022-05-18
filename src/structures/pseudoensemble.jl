@@ -92,10 +92,11 @@ function gevfitbayes(pdata::Pseudoensemble;
     acc_y = falses(n, niter)
     acc = falses(Extremes.nparameter(data_layer), niter)
 
+    parindex = Extremes.paramindex(data_layer)
+
     if isempty(prior)
         prior = Vector{ContinuousUnivariateDistribution}(undef, Extremes.nparameter(data_layer))
 
-        parindex = Extremes.paramindex(data_layer)
         prior[parindex[:μ]] .= Flat()
         prior[parindex[:ϕ]] .= Flat()
         prior[parindex[:ξ]] .= LocationScale(-.5, 1, Beta(6,9))
