@@ -15,7 +15,7 @@ include("utils.jl")
 export 
 
     # Pseudodata type
-    Pseudodata, Pseudoensemble, PseudoMaximaEVA,
+    Pseudodata, Pseudoensemble, PseudoMaximaEVA, PseudoMaximaModel,
 
     # Other functions
     convert,

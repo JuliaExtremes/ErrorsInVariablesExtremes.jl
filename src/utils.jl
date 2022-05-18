@@ -62,3 +62,15 @@ function update_stepsize(δ::Real, accrate::Real)
     Δδ = 0.01 * (2 * (accrate > 0.44) - 1)
     return δ * exp(Δδ)
 end
+
+"""
+    validateprior(p::Int, prior::Vector{<:Distribution})
+
+Validate that the explanatory variables are of length `length`.
+"""
+function validateprior(prior::Vector{<:Distribution}, p::Int)
+
+    if length(prior) != p
+        error("The prior dimension should match the parameter dimension.")
+    end
+end
