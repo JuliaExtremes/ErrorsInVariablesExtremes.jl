@@ -22,3 +22,11 @@
     end
     
 end
+
+@testset "validateprior" begin
+        
+    prior = [Normal(), Normal()]
+
+    @test_throws ErrorException ErrorsInVariablesExtremes.validateprior(prior, 1)
+    
+end
