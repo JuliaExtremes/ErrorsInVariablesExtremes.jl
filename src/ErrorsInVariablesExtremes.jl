@@ -6,7 +6,7 @@ using ProgressMeter
 
 import Base.convert
 import Distributions.pdf, Distributions.logpdf
-import Extremes.gevfitbayes, Extremes.loglike
+import Extremes.fitbayes, Extremes.gevfitbayes, Extremes.loglike, Extremes.paramfun
 import Mamba.dic
 
 include("structures.jl")
