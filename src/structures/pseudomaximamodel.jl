@@ -188,7 +188,7 @@ function fitbayes(model::PseudoMaximaModel,
     maxima_chain = maxima_chain[warmup:thin:niter, :,:]
 
     parameters_chain = Mamba.Chains(collect(params'), names=paramnames)
-    parameters_chain = mparameters_chain[warmup:thin:niter, :,:]
+    parameters_chain = parameters_chain[warmup:thin:niter, :,:]
     
     return PseudoMaximaEVA(model, maxima_chain, parameters_chain)
 
