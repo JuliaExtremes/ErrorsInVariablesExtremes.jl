@@ -43,9 +43,7 @@ function load_discharge_distribution(filename::String)
         push!(pdata, Pseudodata(config[i], t, pd[:,i]))
     end
 
-    pensemble = Pseudoensemble("Ensemble", pdata)
-    
-    return pensemble
+    return pdata
 
 end
 
@@ -66,7 +64,7 @@ end
 """
     validateprior(p::Int, prior::Vector{<:Distribution})
 
-Validate that the explanatory variables are of length `length`.
+Validate that the `prior` distribution vector dimension is of dimension `p`.
 """
 function validateprior(prior::Vector{<:Distribution}, p::Int)
 
