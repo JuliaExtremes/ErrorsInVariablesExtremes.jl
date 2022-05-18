@@ -13,15 +13,15 @@ Encapsulates the probability distributions for each of the unobserved data for a
 struct PseudoMaximaEVA
     model::PseudoMaximaModel
     maxima::Mamba.Chains
-    parameters::fittedEVA
+    parameters::Mamba.Chains
 end
 
 
-function Base.show(io::IO, obj::PseudoMaximaEVA)
+# function Base.show(io::IO, obj::PseudoMaximaEVA)
 
-    showPseudoMaximaEVA(io, obj)
+#     showPseudoMaximaEVA(io, obj)
 
-end
+# end
 
 # function showPseudoMaximaEVA(io::IO, obj::PseudoMaximaEVA; prefix::String = "")
 
