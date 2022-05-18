@@ -52,7 +52,7 @@ function gevfitbayes(pdata::Pseudoensemble;
     locationcov::Vector{<:DataItem} = Vector{Variable}(),
     logscalecov::Vector{<:DataItem} = Vector{Variable}(),
     shapecov::Vector{<:DataItem} = Vector{Variable}(),
-    prior::Vector{ContinuousUnivariateDistribution} = Vector{ContinuousUnivariateDistribution}(),
+    prior::Vector{<:ContinuousUnivariateDistribution} = Vector{ContinuousUnivariateDistribution}(),
     δₒ::Real=0,
     δ::Vector{<:Real}=Float64[],
     warmup::Int=10000,
