@@ -46,18 +46,17 @@ Compute the Deviance Information Criterion (DIC) described by Gelman et al. (201
 Reference:
 Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A. & Rubin, D.B. (2013). *Bayesian Data Analysis (3rd ed.)*. Chapman and Hall/CRC. https://doi.org/10.1201/b16018
 """
-# function dic(fm::PseudoMaximaEVA)
+function dic(fm::PseudoMaximaEVA)
    
-#     Davg = mean(loglike(fm))
+    Davg = mean(logpdf(fm))
     
-#     θ̂ = vec(mean(fm.parameters.sim.value, dims=1))
-#     ŷ = vec(mean(fm.maxima.value, dims=1))
+    ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
     
-#     D = loglike(fm, ŷ, θ̂) 
+    D = logpdf(fm.model, ŷ, θ̂)
     
-#     return 2*Davg - D
+    return 2*Davg - D
         
-# end
+end
 
 
 """
