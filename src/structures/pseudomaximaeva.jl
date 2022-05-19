@@ -58,6 +58,28 @@ Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A. & Rubin, D.B. (
         
 # end
 
+function findposteriormode(fm::PseudoMaximaEVA)
+    
+    nsim = size(fm.maxima.value,1)
+    
+    ll = Vector{Float64}(undef, nsim)
+    
+    for k in 1:nsim
+        y = vec(fm.maxima.value[k,:,1])
+        θ = vec(fm.parameters.value[k,:,1])
+        
+        ll[k] = logpdf(fm.model, y, θ)
+    end
+    
+    ind = argmax(ll)
+    
+    ŷ = vec(fm.maxima.value[ind,:,1])
+    θ̂ = vec(fm.parameters.value[ind,:,1])
+    
+    return ŷ, θ̂
+    
+end
+
 
 """
     function loglike(fm::PseudoMaximaEVA)
