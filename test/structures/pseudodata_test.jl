@@ -1,10 +1,13 @@
 # Test on Structures
 
 @testset "Pseudodata constructor" begin
-    pdata = Pseudodata("Normal", collect(1:10), Normal.(1:10, 1))
+    
+    n = 10
+    pdata = Pseudodata("Normal", collect(1:n), Normal.(zeros(n), 1))
     @test pdata.name == "Normal"
-    @test pdata.year == collect(1:10)
-    @test pdata.value == Normal.(1:10, 1)
+    @test pdata.year ≈ collect(1:n)
+    @test pdata.value == Normal.(zeros(n), 1)
+    
 end
 
 

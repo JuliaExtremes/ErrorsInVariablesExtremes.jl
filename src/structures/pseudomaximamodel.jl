@@ -31,7 +31,7 @@ function PseudoMaximaModel(data::Vector{Pseudodata};
     p = Extremes.nparameter(emptymodel)
     
     if isempty(prior)
-        prior = Vector{Distribution}(undef, p)
+        prior =  Vector{ContinuousUnivariateDistribution}(undef, p)
         prior[1:p] .= Flat()
     else
         validateprior(prior, p)
@@ -193,3 +193,29 @@ function fitbayes(model::PseudoMaximaModel,
     return PseudoMaximaEVA(model, maxima_chain, parameters_chain)
 
 end
+
+"""
+    logpdf(fm::PseudoMaximaModel, y::Vector{<:Real}, θ::Vector{<:Real})
+
+Compute the log density of the model `fm` evaluated at the maxima `y` and at the GEV parameters `θ`.
+"""
+function logpdf(fm::PseudoMaximaModel, y::Vector{<:Real}, θ::Vector{<:Real})
+    
+    ℓ₁ = sum(logpdf(fm.datadistribution, y))
+    
+    evmodel = BlockMaxima(Variable("y", y),
+        fm.location,
+        fm.logscale,
+        fm.shape)
+    
+    ℓ₂ = Extremes.loglike(evmodel, θ)
+    
+    ℓ₃ = 0.0
+    for k in length(θ)
+       ℓ₃ += logpdf(fm.prior[k], θ[k]) 
+    end 
+        
+    return ℓ₁ + ℓ₂ + ℓ₃
+    
+end
+
