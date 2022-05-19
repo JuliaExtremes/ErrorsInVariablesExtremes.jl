@@ -47,6 +47,28 @@ end
 # Methods for Pseudodata
 
 """
+    convert(::Type{DataFrame}, pdata::Vector{Pseudodata})
+
+Convert the vector of Pseudodata type to a DataFrame
+"""
+function convert(::Type{DataFrame}, pdata::Vector{Pseudodata})
+    
+    S = length(pdata)
+    n = length(pdata[1].value)
+    
+    df = DataFrame(Year = Int64[], Configuration = String[], Distribution = ContinuousUnivariateDistribution[])
+    
+    for i in 1:S
+        for j in 1:n
+            push!(df, [pdata[i].year[j], pdata[i].name, pdata[i].value[j]])
+        end
+    end
+    
+    return df
+        
+end
+
+"""
     ensemblemean(pdata::Vector{Pseudodata})
 
 Compute the ensemble mean for each year.
