@@ -17,23 +17,21 @@ struct PseudoMaximaEVA
 end
 
 
-# function Base.show(io::IO, obj::PseudoMaximaEVA)
+function Base.show(io::IO, obj::PseudoMaximaEVA)
 
-#     showPseudoMaximaEVA(io, obj)
+    showPseudoMaximaEVA(io, obj)
 
-# end
+end
 
-# function showPseudoMaximaEVA(io::IO, obj::PseudoMaximaEVA; prefix::String = "")
+function showPseudoMaximaEVA(io::IO, obj::PseudoMaximaEVA; prefix::String = "")
 
-#     show(io::IO, obj.pseudodata, prefix ="  ")
-#     println(io::IO, "")
-#     println(io::IO, "parameters:")
-#     Extremes.showfittedEVA(io::IO, obj.parameters; prefix="  ")
-#     println(io::IO, "")
-#     println(io::IO, "maxima:")
-#     Extremes.showChain(io::IO, obj.maxima, prefix="  ")
-
-# end
+    println(io, prefix, "PseudoMaximaEVA")
+    println(io, prefix, "   model: ", typeof(obj.model))
+    println(io::IO, "   maxima:")
+    Extremes.showChain(io::IO, obj.maxima, prefix="\t\t")
+    println(io::IO, "   parameters:")
+    Extremes.showChain(io::IO, obj.parameters; prefix="\t\t")
+end
 
 
 # Methods for PseudoMaximaEVA
