@@ -1,51 +1,55 @@
-# @testset "fitbayes(::PseudoMaximaModel)" begin
+@testset "fitbayes(::PseudoMaximaModel)" begin
    
-#     n = 100
-#     t = collect(1:n)
+    n = 100
+    t = collect(1:n)
 
-#     Y = rand(GeneralizedExtremeValue(100, 10, -.1), n)
-
-#     η = log.(Y)
-#     ζ = 1/1000
-
-#     pdata = Pseudodata("test", t, LogNormal.(η, ζ))
+    Y = rand(GeneralizedExtremeValue(100, 10, -.1), n)
     
-#     @testset "One member fit" begin
+    eva_fm = gevfit(Y)
+
+    η = log.(Y)
+    ζ = 1/1000
+
+    pdata = Pseudodata("test", t, LogNormal.(η, ζ))
     
-#         model = PseudoMaximaModel([pdata])
-
-#         fm = fitbayes(model)
-
-#         V = Extremes.parametervar(fm.parameters)
-#         δ = 3*sqrt.(diag(V))
-
-        # θ̂ = Extremes.findposteriormode(fm.parameters)
-
-        # @test θ̂[1] ≈ 100 atol = δ[1]
-        # @test θ̂[2] ≈ log(10) atol = δ[2]
-        # @test θ̂[3] ≈ -.1 atol = δ[3]
-
-        # @test fm.parameters.model.data.value ≈ Y rtol=.01
-    # end
+    @testset "One member fit" begin
     
-    # @testset "Fit on several members" begin
+        model = PseudoMaximaModel([pdata])
+
+        fm = fitbayes(model)
+
+        V = Extremes.parametervar(eva_fm)
+        δ = 3*sqrt.(diag(V))
+
+        ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
+
+        @test θ̂[1] ≈ 100 atol = δ[1]
+        @test θ̂[2] ≈ log(10) atol = δ[2]
+        @test θ̂[3] ≈ -.1 atol = δ[3]
+
+        @test ŷ ≈ Y rtol=.01
+    end
     
-    #     pensemble = Pseudoensemble("test", [pdata, pdata, pdata])
-    #     fm = gevfitbayes(pensemble)
-
-    #     V = Extremes.parametervar(fm.parameters)
-    #     δ = 3*sqrt.(diag(V))
-
-    #     θ̂ = Extremes.findposteriormode(fm.parameters)
-
-    #     @test θ̂[1] ≈ 100 atol = δ[1]
-    #     @test θ̂[2] ≈ log(10) atol = δ[2]
-    #     @test θ̂[3] ≈ -.1 atol = δ[3]
-
-    #     @test fm.parameters.model.data.value ≈ Y rtol=.01
-    # end
+    @testset "Fit on several members" begin
     
-# end
+        model = PseudoMaximaModel([pdata, pdata])
+
+        fm = fitbayes(model)
+
+        V = Extremes.parametervar(eva_fm)
+        δ = 3*sqrt.(diag(V))
+
+        ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
+
+        @test θ̂[1] ≈ 100 atol = δ[1]
+        @test θ̂[2] ≈ log(10) atol = δ[2]
+        @test θ̂[3] ≈ -.1 atol = δ[3]
+
+        @test ŷ ≈ Y rtol=.01
+        
+    end
+    
+end
 
 @testset "logpdf(::PseudoMaximaModel, y, θ)" begin
     
