@@ -35,6 +35,9 @@ end
 
 # end
 
+
+# Methods for PseudoMaximaEVA
+
 """
     dic(fm::PseudoMaximaEVA)
 

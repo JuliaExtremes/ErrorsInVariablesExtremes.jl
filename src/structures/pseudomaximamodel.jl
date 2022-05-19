@@ -44,6 +44,37 @@ function PseudoMaximaModel(data::Vector{Pseudodata};
 end
 
 
+"""
+    showpseudomaximamodel(io::IO, obj::PseudoMaximaModel; prefix::String = "")
+
+Display a PseudoMaximaModel with the prefix `prefix` before every line.
+"""
+function showpseudomaximamodel(io::IO, obj::PseudoMaximaModel; prefix::String = "")
+
+    println(io, prefix, "PseudoMaximaModel")
+    println(io, prefix, "  datadistribution: ", typeof(obj.datadistribution), "[", length(obj.datadistribution), "]")
+    println(io, prefix, "  location: ", Extremes.showparamfun("μ", obj.location))
+    println(io, prefix, "  logscale: ", Extremes.showparamfun("ϕ", obj.logscale))
+    println(io, prefix, "  shape: ", Extremes.showparamfun("ξ", obj.shape))
+    println(io, prefix, "  prior: ", "[", model.prior[1] , [string(", ", model.prior[k]) for k in 2:3]...  ,"]")
+
+end
+
+"""
+    Base.show(io::IO, obj::PseudoMaximaModel)
+
+Override of the show function for the objects of type Pseudodata.
+"""
+function Base.show(io::IO, obj::PseudoMaximaModel)
+
+    showpseudomaximamodel(io, obj)
+
+end
+
+
+# Methods for PseudoMaximaModel
+
+
 function fitbayes(model::PseudoMaximaModel,
     δₒ::Real=0,
     δ::Vector{<:Real}=Float64[],
