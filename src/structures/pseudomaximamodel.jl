@@ -75,7 +75,7 @@ end
 # Methods for PseudoMaximaModel
 
 
-function fitbayes(model::PseudoMaximaModel,
+function fitbayes(model::PseudoMaximaModel;
     δₒ::Real=0,
     δ::Vector{<:Real}=Float64[],
     warmup::Int=10000,
