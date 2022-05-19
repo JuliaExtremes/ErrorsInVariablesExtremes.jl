@@ -2,7 +2,7 @@
 @testset "load_discharge_distribution" begin
         
     filename = "data/A2020_Analyse_Historique_QMA_SLSO00003.nc"
-    pensemble = load_discharge_distribution(filename)
+    pdata = load_discharge_distribution(filename)
     
     data = ncread(filename, "Dis")
 
@@ -12,7 +12,7 @@
     for i in size(data, 3)
         for j in size(data, 2)
 
-            pd = pensemble.value[i].value[j]
+            pd = pdata[i].value[j]
 
             q = quantile.(pd, p)
             
@@ -20,5 +20,13 @@
             
         end
     end
+    
+end
+
+@testset "validateprior" begin
+        
+    prior = [Normal(), Normal()]
+
+    @test_throws ErrorException ErrorsInVariablesExtremes.validateprior(prior, 1)
     
 end

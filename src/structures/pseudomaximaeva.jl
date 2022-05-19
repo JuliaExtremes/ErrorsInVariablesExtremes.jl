@@ -11,9 +11,9 @@ Encapsulates the probability distributions for each of the unobserved data for a
 
 """
 struct PseudoMaximaEVA
-    pseudodata::Pseudoensemble
-    parameters::fittedEVA
+    model::PseudoMaximaModel
     maxima::Mamba.Chains
+    parameters::Mamba.Chains
 end
 
 
@@ -25,15 +25,16 @@ end
 
 function showPseudoMaximaEVA(io::IO, obj::PseudoMaximaEVA; prefix::String = "")
 
-    show(io::IO, obj.pseudodata, prefix ="  ")
-    println(io::IO, "")
-    println(io::IO, "parameters:")
-    Extremes.showfittedEVA(io::IO, obj.parameters; prefix="  ")
-    println(io::IO, "")
-    println(io::IO, "maxima:")
-    Extremes.showChain(io::IO, obj.maxima, prefix="  ")
-
+    println(io, prefix, "PseudoMaximaEVA")
+    println(io, prefix, "   model: ", typeof(obj.model))
+    println(io::IO, "   maxima:")
+    Extremes.showChain(io::IO, obj.maxima, prefix="\t\t")
+    println(io::IO, "   parameters:")
+    Extremes.showChain(io::IO, obj.parameters; prefix="\t\t")
 end
+
+
+# Methods for PseudoMaximaEVA
 
 """
     dic(fm::PseudoMaximaEVA)
@@ -47,12 +48,11 @@ Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A. & Rubin, D.B. (
 """
 function dic(fm::PseudoMaximaEVA)
    
-    Davg = mean(loglike(fm))
+    Davg = mean(logpdf(fm))
     
-    θ̂ = vec(mean(fm.parameters.sim.value, dims=1))
-    ŷ = vec(mean(fm.maxima.value, dims=1))
+    ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
     
-    D = loglike(fm, ŷ, θ̂) 
+    D = logpdf(fm.model, ŷ, θ̂)
     
     return 2*Davg - D
         
@@ -60,50 +60,55 @@ end
 
 
 """
-    function loglike(fm::PseudoMaximaEVA)
+    findposteriormode(fm::PseudoMaximaEVA)
 
-Compute the loglikelihood of the ErrorsInVariables extreme value model `fm` for all MCMC iterations.
+Find the point (ŷ, θ̂) among the MCMC iterations of `fm` that maximized the log density.
 """
-function loglike(fm::PseudoMaximaEVA)
+function findposteriormode(fm::PseudoMaximaEVA)
     
-    # Number of MCMC simulations
-    nsim = size(fm.parameters.sim.value, 1)
+    nsim = size(fm.maxima.value,1)
     
-    # Preallocating the vector
     ll = Vector{Float64}(undef, nsim)
     
     for k in 1:nsim
+        y = vec(fm.maxima.value[k,:,1])
+        θ = vec(fm.parameters.value[k,:,1])
+        
+        ll[k] = logpdf(fm.model, y, θ)
+    end
+    
+    ind = argmax(ll)
+    
+    ŷ = vec(fm.maxima.value[ind,:,1])
+    θ̂ = vec(fm.parameters.value[ind,:,1])
+    
+    return ŷ, θ̂
+    
+end
+
+
+"""
+    function logpdf(fm::PseudoMaximaEVA)
+
+Compute the log density of `fm` for all MCMC iterations.
+"""
+function logpdf(fm::PseudoMaximaEVA)
+    
+      # Number of MCMC simulations
+    nsim = size(fm.maxima.value, 1)
+    
+    # Preallocating the vector
+    ll = Vector{Float64}(undef, nsim)
+
+    for k in 1:nsim
     
         y = vec(fm.maxima.value[k, :, 1])
-        θ̂ = vec(fm.parameters.sim.value[k,:,1])
+        θ̂ = vec(fm.parameters.value[k,:,1])
         
-        ll[k] = loglike(fm, y, θ̂)
+        ll[k] = logpdf(fm.model, y, θ̂)
     
     end
     
     return ll
-    
-end
-
-"""
-    function loglike(fm::PseudoMaximaEVA, y::Vector{<:Real}, θ::AbstractVector{<:Real})
-
-Compute the loglikelihood of the ErrorsInVariables extreme value model `fm` given the maxima `y` and the GEV parameters `θ`.
-"""
-function loglike(fm::PseudoMaximaEVA, y::Vector{<:Real}, θ::AbstractVector{<:Real})
-    
-    # Reconstruct the BlockMaxima structure with the data y
-    model = BlockMaxima(Variable("y", y),
-        locationcov = fm.parameters.model.location.covariate,
-        logscalecov = fm.parameters.model.logscale.covariate,
-        shapecov = fm.parameters.model.shape.covariate)
-    
-    # Evaluate the loglikelihood knowing the maxima
-    ℓ₁ = Extremes.loglike(model, θ)
-    
-    # Evaluate the loglikelihood of the maxima
-    ℓ₂ = sum(logpdf(fm.pseudodata, y))
-    
-    return ℓ₁ + ℓ₂
     
 end

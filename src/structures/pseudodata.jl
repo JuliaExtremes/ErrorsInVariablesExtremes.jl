@@ -18,8 +18,49 @@ struct Pseudodata
     value::Vector{<:UnivariateDistribution}
 end
 
+"""
+    showpseudodata(io::IO, obj::Pseudodata; prefix::String = "")
+
+Displays a Pseudodata with the prefix `prefix` before every line.
+"""
+function showpseudodata(io::IO, obj::Pseudodata; prefix::String = "")
+
+    println(io, prefix, "Pseudodata:")
+    println(io, prefix, "  name: ", obj.name)
+    println(io, prefix, "  year: ", typeof(obj.year), "[", length(obj.year), "]")
+    println(io, prefix, "  value:", typeof(obj.value), "[", length(obj.value), "]")
+
+end
+
+"""
+    Base.show(io::IO, obj::Pseudodata)
+
+Override of the show function for the objects of type Pseudodata.
+"""
+function Base.show(io::IO, obj::Pseudodata)
+
+    showpseudodata(io, obj)
+
+end
+
 
 # Methods for Pseudodata
+
+"""
+    ensemblemean(pdata::Vector{Pseudodata})
+
+Compute the ensemble mean for each year.
+"""
+function ensemblemean(pdata::Vector{Pseudodata})
+    
+    S = length(pdata)
+
+    pd = [pdata[i].value for i in 1:S]
+    
+    m = vec(mean(mean.(reduce(hcat,pd)), dims=2))
+    
+end
+
 
 """
     logpdf(pdata::Pseudodata, y::Vector{<:Real})
@@ -45,29 +86,42 @@ function pdf(pdata::Pseudodata, y::Vector{<:Real})
     
     return pdf.(pd, y)
     
-end   
+end  
 
 """
-    showpseudodata(io::IO, obj::Pseudodata; prefix::String = "")
+    logpdf(pensemble::Pseudoensemble, y::Vector{<:Real})
 
-Displays a Pseudodata with the prefix `prefix` before every line.
+Compute the logpdf of each of the potential data `y` according to the distributions in `pensemble`.
+
+#### Details
+
+Independance is assumed between the members of the `pseudoensemble.value`, i.e. the sum of the logpdf of each member is taken.
 """
-function showpseudodata(io::IO, obj::Pseudodata; prefix::String = "")
-
-    println(io, prefix, "Pseudodata:")
-    println(io, prefix, "  name: ", obj.name)
-    println(io, prefix, "  year: ", typeof(obj.year), "[", length(obj.year), "]")
-    println(io, prefix, "  value:", typeof(obj.value), "[", length(obj.value), "]")
-
+function logpdf(datadistribution::Vector{Pseudodata}, y::Vector{<:Real})
+    
+    ll = zeros(length(y))
+    
+    for pdata in datadistribution
+     
+        ll += logpdf(pdata, y)
+        
+    end
+    
+    return ll
+    
 end
 
-"""
-    Base.show(io::IO, obj::Pseudodata)
-
-Override of the show function for the objects of type Pseudodata.
-"""
-function Base.show(io::IO, obj::Pseudodata)
-
-    showpseudodata(io, obj)
-
+function logpdf(datadistribution::Vector{Pseudodata}, y::Real, j::Int)
+    
+    ll = 0.0
+    
+    for pdata in datadistribution
+     
+        ll += logpdf(pdata.value[j], y)
+        
+    end
+    
+    return ll
+    
 end
+
