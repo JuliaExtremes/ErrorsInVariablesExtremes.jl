@@ -56,7 +56,7 @@ function showpseudomaximamodel(io::IO, obj::PseudoMaximaModel; prefix::String = 
     println(io, prefix, "  location: ", Extremes.showparamfun("μ", obj.location))
     println(io, prefix, "  logscale: ", Extremes.showparamfun("ϕ", obj.logscale))
     println(io, prefix, "  shape: ", Extremes.showparamfun("ξ", obj.shape))
-    println(io, prefix, "  prior: ", "[", obj.prior[1] , [string(", ", obj.prior[k]) for k in 2:3]...  ,"]")
+    println(io, prefix, "  prior: ", "[", obj.prior[1] , [string(", ", obj.prior[k]) for k in 2:length(obj.prior)]...  ,"]")
 
 end
 
