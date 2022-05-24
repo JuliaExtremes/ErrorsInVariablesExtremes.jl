@@ -266,3 +266,20 @@ function logpdf(fm::PseudoMaximaModel, y::Vector{<:Real}, θ::Vector{<:Real})
     
 end
 
+"""
+    standardize(model::PseudoMaximaModel, y::AbstractVector{<:Real}, θ::AbstractVector{<:Real})
+
+Standardize the data `y` to the standard Gumbel distribution using the underlying extreme value model in `model` of parameters `θ`.
+"""
+function standardize(model::PseudoMaximaModel, y::AbstractVector{<:Real}, θ::AbstractVector{<:Real})
+   
+    bmm = BlockMaxima(Variable("y", y),
+        model.location,
+        model.logscale,
+        model.shape)
+    
+    pd = Extremes.getdistribution(bmm, θ)
+    
+    return Extremes.standardize.(y, location.(pd), scale.(pd), shape.(pd))
+    
+end
