@@ -51,6 +51,29 @@
     
 end
 
+@testset "isstationary(::PseudoMaximaModel)" begin
+
+    @testset "stationary model" begin
+    
+        pm = PseudoMaximaModel([Pseudodata("y", [1], [Normal()])],
+            prior = [Flat(), Flat(), Flat()])
+    
+        @test ErrorsInVariablesExtremes.isstationary(pm)
+    
+    end
+
+    @testset "nonstationary model" begin
+    
+        pm = PseudoMaximaModel([Pseudodata("y", [1], [Normal()])],
+            locationcov = [Variable("x", [1])],
+            prior = [Flat(), Flat(), Flat(), Flat()])
+    
+        @test !(ErrorsInVariablesExtremes.isstationary(pm))
+    
+    end
+
+end
+
 @testset "logpdf(::PseudoMaximaModel, y, θ)" begin
     
     @testset "stationary model" begin

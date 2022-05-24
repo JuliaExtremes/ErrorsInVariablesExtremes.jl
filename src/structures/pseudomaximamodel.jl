@@ -226,6 +226,22 @@ function fitbayes(model::PseudoMaximaModel;
 end
 
 """
+    isstationary(model::PseudoMaximaModel)
+
+Check if the underlying extreme value model of the PseusoMaximaModel `model` is stationary.
+"""
+function isstationary(model::PseudoMaximaModel)
+   
+    bm = Extremes.BlockMaxima(Variable("y",Float64[]),
+        model.location,
+        model.logscale,
+        model.shape)
+    
+    return Extremes.getcovariatenumber(bm) > 0 ? false : true
+    
+end
+
+"""
     logpdf(fm::PseudoMaximaModel, y::Vector{<:Real}, θ::Vector{<:Real})
 
 Compute the log density of the model `fm` evaluated at the maxima `y` and at the GEV parameters `θ`.
