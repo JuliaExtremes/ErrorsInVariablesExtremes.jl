@@ -86,6 +86,25 @@ function findposteriormode(fm::PseudoMaximaEVA)
     
 end
 
+"""
+    getdistribution(fm::PseudoMaximaEVA)
+
+Return the underlying extreme value distribution for each MCMC iterations.
+"""
+function getdistribution(fm::PseudoMaximaEVA)
+
+    v = fm.parameters.value[:,:,1]
+
+    V = Extremes.slicematrix(v, dims=2)
+
+    D = ErrorsInVariablesExtremes.getdistribution.(fm.model, V)
+
+    d = Extremes.unslicematrix(D, dims=2)
+
+    return d
+
+end
+
 
 """
     function logpdf(fm::PseudoMaximaEVA)

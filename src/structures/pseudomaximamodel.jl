@@ -44,6 +44,9 @@ function PseudoMaximaModel(data::Vector{Pseudodata};
 end
 
 
+Base.Broadcast.broadcastable(obj::PseudoMaximaModel) = Ref(obj)
+
+
 """
     showpseudomaximamodel(io::IO, obj::PseudoMaximaModel; prefix::String = "")
 
@@ -226,6 +229,22 @@ function fitbayes(model::PseudoMaximaModel;
 end
 
 """
+    getdistribution(pmm::PseudoMaximaModel, θ::AbstractVector{<:Real})
+
+Return the underlying extreme value distribution of `pmm` with parameters `θ`.
+"""
+function getdistribution(pmm::PseudoMaximaModel, θ::AbstractVector{<:Real})
+   
+    bmm = BlockMaxima(Variable("empty", Float64[]),
+        pmm.location,
+        pmm.logscale,
+        pmm.shape)
+    
+    return Extremes.getdistribution(bmm, θ)
+    
+end
+
+"""
     isstationary(model::PseudoMaximaModel)
 
 Check if the underlying extreme value model of the PseusoMaximaModel `model` is stationary.
@@ -272,13 +291,8 @@ end
 Standardize the data `y` to the standard Gumbel distribution using the underlying extreme value model in `model` of parameters `θ`.
 """
 function standardize(model::PseudoMaximaModel, y::AbstractVector{<:Real}, θ::AbstractVector{<:Real})
-   
-    bmm = BlockMaxima(Variable("y", y),
-        model.location,
-        model.logscale,
-        model.shape)
-    
-    pd = Extremes.getdistribution(bmm, θ)
+
+    pd = ErrorsInVariablesExtremes.getdistribution(model, θ)
     
     return Extremes.standardize.(y, location.(pd), scale.(pd), shape.(pd))
     

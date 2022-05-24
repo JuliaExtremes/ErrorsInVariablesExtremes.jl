@@ -51,6 +51,36 @@
     
 end
 
+@testset "getdistribution(::PseudoMaximaModel)" begin
+
+    y = [90., 100., 110.]
+
+    pdata = Pseudodata("y", collect(0:2), Normal.(y, 1/100))
+    
+    @testset "stationary model" begin
+       
+        model = PseudoMaximaModel([pdata],
+        prior=[Flat(), Flat(), Flat()])
+
+        θ = [100., log(10), -.1]
+
+        @test ErrorsInVariablesExtremes.getdistribution(model, θ)[] .== GeneralizedExtremeValue(θ[1], exp(θ[2]), θ[3])
+        
+    end
+    
+    @testset "nonstationary model" begin
+       
+        model = PseudoMaximaModel([pdata], locationcov = [Variable("x", collect(0:2))],
+        prior=[Flat(), Flat(), Flat(), Flat()])
+
+        θ = [90., 10., log(10), -.1]
+
+        @test all(ErrorsInVariablesExtremes.getdistribution(model, θ) .== GeneralizedExtremeValue.(θ[1] .+ θ[2].*collect(0:2), exp(θ[3]), θ[4]))
+        
+    end
+    
+end
+
 @testset "isstationary(::PseudoMaximaModel)" begin
 
     @testset "stationary model" begin

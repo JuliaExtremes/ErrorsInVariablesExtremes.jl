@@ -45,6 +45,54 @@ end
     
 end
 
+@testset "getdistribution(::PseudoMaximaEVA)" begin
+    
+    y = [90., 100., 110.]
+   
+    pdata = Pseudodata("y", collect(0:2), Normal.(y, 1/100))
+    
+    Y = [y' .- .1 ; y' ; y' .+ .1]
+    
+    @testset "stationary model" begin
+        
+        θ = [90 log(10) -.1; 100 log(10) -.1; 110 log(10) -.1]
+        
+        pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+        
+        fm = PseudoMaximaEVA(pmm, 
+        Mamba.Chains(Y), 
+        Mamba.Chains(θ))
+
+        μ = θ[:,1]
+        σ = exp.(θ[:,2])
+        ξ = θ[:,3]
+
+        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== GeneralizedExtremeValue.(μ, σ, ξ))
+        
+    end
+    
+    @testset "nonstationary model" begin
+       
+        θ = [80 10 log(10) -.1; 90 10 log(10) -.1; 100 10 log(10) -.1]
+
+        pmm = PseudoMaximaModel([pdata], 
+            locationcov = [Variable("x", collect(0:2))],
+            prior=[Flat(), Flat(), Flat(), Flat()])
+
+        fm = PseudoMaximaEVA(pmm, 
+                Mamba.Chains(Y), 
+                Mamba.Chains(θ))
+
+        μ = θ[:,1] .+ θ[:,2].*collect(0:2)'
+        σ = exp.(θ[:,3])
+        ξ = θ[:,4]
+
+        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== GeneralizedExtremeValue.(μ, σ, ξ))
+        
+    end
+    
+end
+
 @testset "logpdf(::PseudoMaximaEVA)" begin
 
     Y = fill(100,3)
