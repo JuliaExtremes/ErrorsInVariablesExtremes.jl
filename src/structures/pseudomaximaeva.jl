@@ -386,8 +386,7 @@ function returnlevelplot(fm::PseudoMaximaEVA)
     
     @assert ErrorsInVariablesExtremes.isstationary(fm.model) "The model should be stationary."
     
-    T, x, y = ErrorsInVariablesExtremes.returnlevelplot_data(fm1)
-
+    T, x, y = ErrorsInVariablesExtremes.returnlevelplot_data(fm)
 
     x̄ = vec(mean(x, dims=1))
     ȳ = vec(mean(y, dims=1))
