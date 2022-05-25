@@ -1,47 +1,243 @@
 
-@testset "dic(::PseudoMaximaEVA)" begin
-   
-    # Test dic() with 2 maxima and two MCMC iterations
+@testset "findposteriormode(::PseudoMaximaEVA)" begin
+
+    Y = fill(100,3)
+
+    η = log.(Y)
+    ζ = 1/100
+
+    pdata = Pseudodata("test", collect(1:length(Y)), LogNormal.(η, ζ))
+
+    model = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+
+    fm = PseudoMaximaEVA(model, 
+        Mamba.Chains([Y'; Y' .+ 10 ;  Y' .+ 20]), 
+        Mamba.Chains([100 log(10) -.1; 50 log(10) -.1; 150 log(10) -.1]))
+
+    ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
     
-    model = BlockMaxima(Variable("y", [.5, 1]))
-
-    fm = BayesianEVA(model, Mamba.Chains([0 0 -.1; -1 0 -.1], names=["μ", "ϕ", "ξ"]))
-
-    p₁ = Pseudodata("y₁", [1] ,[Normal(0,1)])
-    p₂ = Pseudodata("y₂", [1] ,[Normal(1,1)])
-
-    pensemble = Pseudoensemble("test", [p₁, p₂])
-
-    eiv_model = PseudoMaximaEVA(pensemble, fm, Mamba.Chains([.5 1; 0 .5], names=["Y[1]", "Y[2]"]))
-
-    ŷ = vec(mean([.5 1; 0 .5], dims=1))
-    θ̂ = vec(mean([0 0 -.1; -1 0 -.1], dims=1))
-    
-    @test dic(eiv_model) ≈ (2*mean(loglike(eiv_model)) - loglike(eiv_model, ŷ, θ̂))
+    @test ŷ ≈ Y
+    @test θ̂ ≈ [100, log(10), -.1]
     
 end
 
-@testset "loglike(::PseudoMaximaEVA)" begin
+
+@testset "dic(::PseudoMaximaEVA)" begin
    
-    # Test for 2 maxima and two MCMC iterations
+    # Test dic() with 3 maxima and 3 MCMC iterations
     
-    model = BlockMaxima(Variable("y", [.5, 1]))
+    Y = fill(100,3)
 
-    fm = BayesianEVA(model, Mamba.Chains([0 0 -.1; -1 0 -.1], names=["μ", "ϕ", "ξ"]))
+    η = log.(Y)
+    ζ = 1/100
 
-    p₁ = Pseudodata("y₁", [1] ,[Normal(0,1)])
-    p₂ = Pseudodata("y₂", [1] ,[Normal(1,1)])
+    pdata = Pseudodata("test", collect(1:length(Y)), LogNormal.(η, ζ))
 
-    pensemble = Pseudoensemble("test", [p₁, p₂])
+    model = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
 
-    eiv_model = PseudoMaximaEVA(pensemble, fm, Mamba.Chains([.5 1; 0 .5], names=["Y[1]", "Y[2]"]))
+    fm = PseudoMaximaEVA(model, 
+            Mamba.Chains([Y'; Y' .+ 10 ;  Y' .+ 20]), 
+            Mamba.Chains([100 log(10) -.1; 50 log(10) -.1; 150 log(10) -.1]))
+
+    res = 2*mean(logpdf(fm)) - logpdf(fm.model, Y, [100, log(10), -.1])
     
-    res = loglike(eiv_model)
+    @test dic(fm) ≈ res
     
-    @testset "loglike values" begin
-        @test res[1] ≈ sum(logpdf.(Normal(0,1), [.5, 1]) + logpdf.(Normal(1,1), [.5, 1]) + logpdf.(GeneralizedExtremeValue(0,1,-.1), [.5, 1]))
-        @test res[2] ≈ sum(logpdf.(Normal(0,1), [0, .5]) + logpdf.(Normal(1,1), [0, .5]) + logpdf.(GeneralizedExtremeValue(-1,1,-.1), [0, .5]))
+end
+
+@testset "getdistribution(::PseudoMaximaEVA)" begin
+    
+    y = [90., 100., 110.]
+   
+    pdata = Pseudodata("y", collect(0:2), Normal.(y, 1/100))
+    
+    Y = [y' .- .1 ; y' ; y' .+ .1]
+    
+    @testset "stationary model" begin
+        
+        θ = [90 log(10) -.1; 100 log(10) -.1; 110 log(10) -.1]
+        
+        pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+        
+        fm = PseudoMaximaEVA(pmm, 
+        Mamba.Chains(Y), 
+        Mamba.Chains(θ))
+
+        μ = θ[:,1]
+        σ = exp.(θ[:,2])
+        ξ = θ[:,3]
+
+        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== GeneralizedExtremeValue.(μ, σ, ξ))
+        
+    end
+    
+    @testset "nonstationary model" begin
+       
+        θ = [80 10 log(10) -.1; 90 10 log(10) -.1; 100 10 log(10) -.1]
+
+        pmm = PseudoMaximaModel([pdata], 
+            locationcov = [Variable("x", collect(0:2))],
+            prior=[Flat(), Flat(), Flat(), Flat()])
+
+        fm = PseudoMaximaEVA(pmm, 
+                Mamba.Chains(Y), 
+                Mamba.Chains(θ))
+
+        μ = θ[:,1] .+ θ[:,2].*collect(0:2)'
+        σ = exp.(θ[:,3])
+        ξ = θ[:,4]
+
+        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== GeneralizedExtremeValue.(μ, σ, ξ))
+        
     end
     
 end
 
+@testset "logpdf(::PseudoMaximaEVA)" begin
+
+    Y = fill(100,3)
+
+    η = log.(Y)
+    ζ = 1/100
+
+    pdata = Pseudodata("test", collect(1:length(Y)), LogNormal.(η, ζ))
+
+    model = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+
+    fm = PseudoMaximaEVA(model, 
+            Mamba.Chains([Y'; Y' .+ 10 ;  Y' .+ 20]), 
+            Mamba.Chains([100 log(10) -.1; 50 log(10) -.1; 150 log(10) -.1]))
+    
+    res = logpdf(fm)
+    
+    @test res[1] ≈ sum(logpdf(pdata, Y) + logpdf.(GeneralizedExtremeValue(100, 10, -.1), Y))
+    @test res[2] ≈ sum(logpdf(pdata, Y .+ 10) + logpdf.(GeneralizedExtremeValue(50, 10, -.1), Y .+ 10))
+    @test res[3] ≈ sum(logpdf(pdata, Y .+ 20) + logpdf.(GeneralizedExtremeValue(150, 10, -.1), Y .+ 20))
+    
+end
+
+# Tests on diagnostic plots
+
+@testset "diagnostic plots for stationary model" begin
+   
+    y = [90., 100., 110.]
+    
+    n = length(y)
+    
+    Y = [y' .- 1 ; y' ; y' .+ 1]
+    
+    p₀ = [.25 .5 .75;
+         .25 .5 .75;
+         .25 .5 .75]
+
+    Θ = [90 log(10) -.1;
+        100 log(10) -.1;
+        110 log(10) -.1]
+
+    pdata = Pseudodata("y", collect(1:3), Normal.(y, 1/100))
+
+    pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+
+    fmm = PseudoMaximaEVA(pmm, Mamba.Chains(Y), Mamba.Chains(Θ))
+    
+    pd = GeneralizedExtremeValue.(Θ[:,1], exp.(Θ[:,2]), Θ[:,3])
+    
+    @testset "probplot_data" begin
+
+        p, p̂ = ErrorsInVariablesExtremes.probplot_data(fmm)
+
+        @test all(p .≈ p₀[1,:])
+        @test all(p̂ .≈ cdf.(pd, Y))
+    end
+    
+    @testset "qqplot_data" begin
+
+        q, q̂ = ErrorsInVariablesExtremes.qqplot_data(fmm)
+
+        @test all(q .≈ Y)
+        @test all(q̂ .≈ quantile.(pd, p₀))
+    end
+    
+    @testset "histplot_data" begin
+
+        d, xp, d̂ = ErrorsInVariablesExtremes.histplot_data(fmm)
+
+        @test all(d .≈ Y) 
+
+        @test all(d̂ .≈ pdf.(pd, collect(xp')))
+    end
+    
+    @testset "returnlevel_data" begin
+
+        T, r, r̂ = ErrorsInVariablesExtremes.returnlevelplot_data(fmm)
+
+        @test all(T .≈ 1 ./ (1 .- p₀[1,:]))
+
+        @test all(r .≈ Y)
+
+        @test all(r̂ .≈ quantile.(pd, p₀ ))
+    end
+
+    
+end
+
+@testset "diagnostic plots for nonstationary model" begin
+   
+    y = [90., 100., 110.]
+    
+    n = length(y)
+    
+    Y = [y' .- 1 ; y' ; y' .+ 1]
+    
+    p₀ = [.25 .5 .75;
+         .25 .5 .75;
+         .25 .5 .75]
+
+    Θ = [80 5 log(10) -.1;
+        90 5 log(10) -.1;
+        100 5 log(10) -.1]
+    
+    nsim = 3
+
+    pdata = Pseudodata("y", collect(1:3), Normal.(y, 1/100))
+
+    pmm = PseudoMaximaModel([pdata],
+        locationcov = [Variable("x", collect(0:2))],
+        prior=[Flat(), Flat(), Flat(), Flat()])
+
+    fmm = PseudoMaximaEVA(pmm, Mamba.Chains(Y), Mamba.Chains(Θ))
+    
+    pd = ErrorsInVariablesExtremes.getdistribution(fmm)
+    
+    Z = Matrix{Float64}(undef, nsim, n)
+    for k in 1:nsim
+        Z[k,:] = ErrorsInVariablesExtremes.standardize(fmm.model, Y[k,:], Θ[k,:])
+    end
+    
+    @testset "probplot_std_data" begin
+
+        p, p̂ = ErrorsInVariablesExtremes.probplot_std_data(fmm)
+
+        @test all(p .≈ p₀[1,:])
+        
+        @test all(p̂ .≈ cdf.(Gumbel(), Z))
+    end
+    
+    @testset "qqplot_std_data" begin
+
+        q, q̂ = ErrorsInVariablesExtremes.qqplot_std_data(fmm)
+
+        @test all(q .≈ Z)
+        @test all(q̂ .≈ quantile.(Gumbel(), p₀))
+    end
+    
+    @testset "histplot_std_data" begin
+
+        d, xp, d̂ = ErrorsInVariablesExtremes.histplot_std_data(fmm)
+
+        @test all(d .≈ Z) 
+
+        @test all(d̂ .≈ pdf.(Gumbel(), repeat(xp', 3)))
+    end
+    
+end

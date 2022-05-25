@@ -43,9 +43,7 @@ function load_discharge_distribution(filename::String)
         push!(pdata, Pseudodata(config[i], t, pd[:,i]))
     end
 
-    pensemble = Pseudoensemble("Ensemble", pdata)
-    
-    return pensemble
+    return pdata
 
 end
 
@@ -61,4 +59,16 @@ Update of the random walk step size for the Metropolis-Hastings algorithm
 function update_stepsize(δ::Real, accrate::Real)
     Δδ = 0.01 * (2 * (accrate > 0.44) - 1)
     return δ * exp(Δδ)
+end
+
+"""
+    validateprior(p::Int, prior::Vector{<:Distribution})
+
+Validate that the `prior` distribution vector dimension is of dimension `p`.
+"""
+function validateprior(prior::Vector{<:Distribution}, p::Int)
+
+    if length(prior) != p
+        error("The prior dimension should match the parameter dimension.")
+    end
 end
