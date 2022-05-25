@@ -115,3 +115,129 @@ end
     @test res[3] ≈ sum(logpdf(pdata, Y .+ 20) + logpdf.(GeneralizedExtremeValue(150, 10, -.1), Y .+ 20))
     
 end
+
+# Tests on diagnostic plots
+
+@testset "diagnostic plots for stationary model" begin
+   
+    y = [90., 100., 110.]
+    
+    n = length(y)
+    
+    Y = [y' .- 1 ; y' ; y' .+ 1]
+    
+    p₀ = [.25 .5 .75;
+         .25 .5 .75;
+         .25 .5 .75]
+
+    Θ = [90 log(10) -.1;
+        100 log(10) -.1;
+        110 log(10) -.1]
+
+    pdata = Pseudodata("y", collect(1:3), Normal.(y, 1/100))
+
+    pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+
+    fmm = PseudoMaximaEVA(pmm, Mamba.Chains(Y), Mamba.Chains(Θ))
+    
+    pd = GeneralizedExtremeValue.(Θ[:,1], exp.(Θ[:,2]), Θ[:,3])
+    
+    @testset "probplot_data" begin
+
+        p, p̂ = ErrorsInVariablesExtremes.probplot_data(fmm)
+
+        @test all(p .≈ p₀[1,:])
+        @test all(p̂ .≈ cdf.(pd, Y))
+    end
+    
+    @testset "qqplot_data" begin
+
+        q, q̂ = ErrorsInVariablesExtremes.qqplot_data(fmm)
+
+        @test all(q .≈ Y)
+        @test all(q̂ .≈ quantile.(pd, p₀))
+    end
+    
+    @testset "histplot_data" begin
+
+        d, xp, d̂ = ErrorsInVariablesExtremes.histplot_data(fmm)
+
+        @test all(d .≈ Y) 
+
+        @test all(d̂ .≈ pdf.(pd, collect(xp')))
+    end
+    
+    @testset "returnlevel_data" begin
+
+        T, r, r̂ = ErrorsInVariablesExtremes.returnlevelplot_data(fmm)
+
+        @test all(T .≈ 1 ./ (1 .- p₀[1,:]))
+
+        @test all(r .≈ Y)
+
+        @test all(r̂ .≈ quantile.(pd, p₀ ))
+    end
+
+    
+end
+
+@testset "diagnostic plots for nonstationary model" begin
+   
+    y = [90., 100., 110.]
+    
+    n = length(y)
+    
+    Y = [y' .- 1 ; y' ; y' .+ 1]
+    
+    p₀ = [.25 .5 .75;
+         .25 .5 .75;
+         .25 .5 .75]
+
+    Θ = [80 5 log(10) -.1;
+        90 5 log(10) -.1;
+        100 5 log(10) -.1]
+    
+    nsim = 3
+
+    pdata = Pseudodata("y", collect(1:3), Normal.(y, 1/100))
+
+    pmm = PseudoMaximaModel([pdata],
+        locationcov = [Variable("x", collect(0:2))],
+        prior=[Flat(), Flat(), Flat(), Flat()])
+
+    fmm = PseudoMaximaEVA(pmm, Mamba.Chains(Y), Mamba.Chains(Θ))
+    
+    pd = ErrorsInVariablesExtremes.getdistribution(fmm)
+    
+    Z = Matrix{Float64}(undef, nsim, n)
+    for k in 1:nsim
+        Z[k,:] = ErrorsInVariablesExtremes.standardize(fmm.model, Y[k,:], Θ[k,:])
+    end
+    
+    @testset "probplot_std_data" begin
+
+        p, p̂ = ErrorsInVariablesExtremes.probplot_std_data(fmm)
+
+        @test all(p .≈ p₀[1,:])
+        
+        @test all(p̂ .≈ cdf.(Gumbel(), Z))
+    end
+    
+    @testset "qqplot_std_data" begin
+
+        q, q̂ = ErrorsInVariablesExtremes.qqplot_std_data(fmm)
+
+        @test all(q .≈ Z)
+        @test all(q̂ .≈ quantile.(Gumbel(), p₀))
+    end
+    
+    @testset "histplot_std_data" begin
+
+        d, xp, d̂ = ErrorsInVariablesExtremes.histplot_std_data(fmm)
+
+        @test all(d .≈ Z) 
+
+        @test all(d̂ .≈ pdf.(Gumbel(), repeat(xp', 3)))
+    end
+    
+end
