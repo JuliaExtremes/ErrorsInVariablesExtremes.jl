@@ -1,7 +1,7 @@
 name = "ErrorsInVariablesExtremes"
 uuid = "c1756c21-7c96-440f-aecc-f5efe7ee0c42"
 authors = ["Jonathan Jalbert <jonathan.jalbert@polymtl.ca>", "Duy Anh Alexandre <duy-anh.alexandre@polymtl.ca>", "Gabriel Gobeil <gabriel.gobeil199@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
