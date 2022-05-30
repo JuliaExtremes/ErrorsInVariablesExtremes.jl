@@ -21,6 +21,29 @@
     
 end
 
+@testset "convert(::Type{MaximumLikelihoodEVA}, fm::PseudoMaximaEVA, iter::Int)" begin
+    
+    y = [90., 100., 110.]
+   
+    pdata = Pseudodata("y", collect(0:2), Normal.(y, 1/100))
+    
+    Y = [y' .- .1 ; y' ; y' .+ .1]
+    
+    θ = [90 log(10) -.1; 100 log(10) -.1; 110 log(10) -.1]
+    
+    pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+    
+    fm = PseudoMaximaEVA(pmm, 
+        Mamba.Chains(Y), 
+        Mamba.Chains(θ))
+    
+    res = convert(MaximumLikelihoodEVA, fm, 2)
+    
+    @test all(res.model.data.value .≈ Y[2,:])
+    @test all(res.θ̂ .≈ θ[2,:])
+    
+end
+
 
 @testset "dic(::PseudoMaximaEVA)" begin
    

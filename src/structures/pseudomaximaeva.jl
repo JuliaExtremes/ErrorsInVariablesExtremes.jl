@@ -36,6 +36,21 @@ end
 
 # Methods for PseudoMaximaEVA
 
+
+"""
+    convert(::Type{MaximumLikelihoodEVA}, fm::PseudoMaximaEVA, iter::Int)
+
+Convert a single MCMC iteration of the fm model to a pseudo MaximumLikelihoodEVA for hacking Extremes.jl methods. 
+"""
+function convert(::Type{MaximumLikelihoodEVA}, fm::PseudoMaximaEVA, iter::Int)
+    
+        bm = BlockMaxima(Variable("y", fm.maxima.value[iter, :, 1]),
+        fm.model.location, fm.model.logscale, fm.model.shape)
+
+        return MaximumLikelihoodEVA(bm, fm.parameters.value[iter, :, 1])
+    
+end
+
 """
     dic(fm::PseudoMaximaEVA)
 
