@@ -132,6 +132,19 @@ function logpdf(fm::PseudoMaximaEVA)
     
 end
 
+"""
+    thin(fm::PseudoMaximaEVA, step::Int)
+
+Discard all but every `step`th MCMC iteration of `fm.maxima` and `fm.parameters`.
+"""
+function thin(fm::PseudoMaximaEVA, step::Int)
+   
+    @assert step > 0 "The thinning step shoud be a strictly positive integer."
+    
+    res = PseudoMaximaEVA(fm.model, fm.maxima[1:step:end,:,:], fm.parameters[1:step:end, :,:])
+    
+end
+
 # Diagnostic plots
 
 """
@@ -427,4 +440,5 @@ function returnlevelplot_data(fm::PseudoMaximaEVA)
     return T, x, y
 
 end
+
 

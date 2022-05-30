@@ -181,6 +181,32 @@ end
     
 end
 
+
+@testset "thin(::PseudoMaximaEVA, step::Int)" begin
+    
+    y = [90., 100., 110.]
+   
+    pdata = Pseudodata("y", collect(0:2), Normal.(y, 1/100))
+    
+    Y = [y' .- .1 ; y' ; y' .+ .1]
+    
+    θ = [90 log(10) -.1; 100 log(10) -.1; 110 log(10) -.1]
+    
+    pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+    
+    fm = PseudoMaximaEVA(pmm, 
+        Mamba.Chains(Y), 
+        Mamba.Chains(θ))
+    
+    res = ErrorsInVariablesExtremes.thin(fm, 2)
+    
+    @test all(res.maxima.value .≈ Y[1:2:end, :])
+    @test all(res.parameters.value .≈ θ[1:2:end, :])
+    
+end
+
+
+
 @testset "diagnostic plots for nonstationary model" begin
    
     y = [90., 100., 110.]
