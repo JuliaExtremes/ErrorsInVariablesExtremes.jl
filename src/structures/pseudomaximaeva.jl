@@ -16,6 +16,7 @@ struct PseudoMaximaEVA
     parameters::Mamba.Chains
 end
 
+Base.Broadcast.broadcastable(obj::PseudoMaximaEVA) = Ref(obj)
 
 function Base.show(io::IO, obj::PseudoMaximaEVA)
 
@@ -102,21 +103,32 @@ function findposteriormode(fm::PseudoMaximaEVA)
 end
 
 """
+    getdistribution(fm::PseudoMaximaEVA, iter::Int)
+
+Return the underlying extreme value distribution of the MCMC iteration `iter`.
+"""
+function getdistribution(fm::PseudoMaximaEVA, iter::Int)
+    
+    @assert iter > 0 "The specified MCMC iteration shoud be greater than 0."
+    
+    θᵢ = fm.parameters.value[iter,:,1]
+
+    return ErrorsInVariablesExtremes.getdistribution(fm.model, θᵢ)
+
+end
+
+"""
     getdistribution(fm::PseudoMaximaEVA)
 
 Return the underlying extreme value distribution for each MCMC iterations.
 """
 function getdistribution(fm::PseudoMaximaEVA)
+    
+    nsim = size(fm.maxima.value,1)
+    
+    D = getdistribution.(fm, 1:nsim)
 
-    v = fm.parameters.value[:,:,1]
-
-    V = Extremes.slicematrix(v, dims=2)
-
-    D = ErrorsInVariablesExtremes.getdistribution.(fm.model, V)
-
-    d = Extremes.unslicematrix(D, dims=2)
-
-    return d
+    return Extremes.unslicematrix(D, dims=2)
 
 end
 
