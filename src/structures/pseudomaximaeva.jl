@@ -66,7 +66,8 @@ function dic(fm::PseudoMaximaEVA)
    
     Davg = mean(logpdf(fm))
     
-    ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
+    ŷ = vec(mean(fm.maxima.value[:,:,1], dims=1))
+    θ̂ = vec(mean(fm.parameters.value[:,:,1], dims=1))
     
     D = logpdf(fm.model, ŷ, θ̂)
     
@@ -74,33 +75,6 @@ function dic(fm::PseudoMaximaEVA)
         
 end
 
-
-"""
-    findposteriormode(fm::PseudoMaximaEVA)
-
-Find the point (ŷ, θ̂) among the MCMC iterations of `fm` that maximized the log density.
-"""
-function findposteriormode(fm::PseudoMaximaEVA)
-    
-    nsim = size(fm.maxima.value,1)
-    
-    ll = Vector{Float64}(undef, nsim)
-    
-    for k in 1:nsim
-        y = vec(fm.maxima.value[k,:,1])
-        θ = vec(fm.parameters.value[k,:,1])
-        
-        ll[k] = logpdf(fm.model, y, θ)
-    end
-    
-    ind = argmax(ll)
-    
-    ŷ = vec(fm.maxima.value[ind,:,1])
-    θ̂ = vec(fm.parameters.value[ind,:,1])
-    
-    return ŷ, θ̂
-    
-end
 
 """
     getdistribution(fm::PseudoMaximaEVA, iter::Int)
