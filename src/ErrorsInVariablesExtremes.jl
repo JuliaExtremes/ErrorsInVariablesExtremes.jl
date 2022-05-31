@@ -7,7 +7,7 @@ using ProgressMeter
 
 import Base.convert
 import Distributions.pdf, Distributions.logpdf
-import Extremes.fitbayes, Extremes.loglike, Extremes.paramfun
+import Extremes.fitbayes, Extremes.loglike, Extremes.paramfun, Extremes.quantile
 import Extremes.diagnosticplots, Extremes.histplot, Extremes.probplot, Extremes.qqplot, Extremes.returnlevelplot
 import Mamba.dic
 
@@ -27,7 +27,8 @@ export
     load_discharge_distribution,
     logpdf,
     loglike,
-    pdf
+    pdf,
+    quantile,
 
     # Diagnostic plots
     diagnosticplots, 

@@ -134,6 +134,19 @@ function logpdf(fm::PseudoMaximaEVA)
 end
 
 """
+    quantile(fm::PseudoMaximaEVA, order::Real)
+
+Compute the effective quantiles or order `order` for each MCMC iteration of model `fm`.
+"""
+function quantile(fm::PseudoMaximaEVA, order::Real)
+    
+    pd = ErrorsInVariablesExtremes.getdistribution(fm)
+   
+    return quantile.(pd, order)
+    
+end
+
+"""
     thin(fm::PseudoMaximaEVA, step::Int)
 
 Discard all but every `step`th MCMC iteration of `fm.maxima` and `fm.parameters`.
