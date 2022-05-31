@@ -77,20 +77,20 @@ end
     Y = [y' .- .1 ; y' ; y' .+ .1]
     
     @testset "stationary model" begin
-        
+    
         θ = [90 log(10) -.1; 100 log(10) -.1; 110 log(10) -.1]
-        
+
         pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
-        
+
         fm = PseudoMaximaEVA(pmm, 
-        Mamba.Chains(Y), 
-        Mamba.Chains(θ))
+            Mamba.Chains(Y), 
+            Mamba.Chains(θ))
 
-        μ = θ[:,1]
-        σ = exp.(θ[:,2])
-        ξ = θ[:,3]
+        @test ErrorsInVariablesExtremes.getdistribution(fm, 2)[] ==
+            GeneralizedExtremeValue(θ[2,1], exp(θ[2,2]), θ[2,3])
 
-        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== GeneralizedExtremeValue.(μ, σ, ξ))
+        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== 
+            GeneralizedExtremeValue.(θ[:,1], exp.(θ[:,2]), θ[:,3]))
         
     end
     
@@ -109,8 +109,12 @@ end
         μ = θ[:,1] .+ θ[:,2].*collect(0:2)'
         σ = exp.(θ[:,3])
         ξ = θ[:,4]
-
-        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== GeneralizedExtremeValue.(μ, σ, ξ))
+        
+        @test all(ErrorsInVariablesExtremes.getdistribution(fm, 2) .== 
+            GeneralizedExtremeValue.(μ[2,:], σ[2], ξ[2]))
+        
+        @test all(ErrorsInVariablesExtremes.getdistribution(fm) .== 
+            GeneralizedExtremeValue.(μ, σ[2], ξ[2]))
         
     end
     
