@@ -1,25 +1,4 @@
 
-@testset "findposteriormode(::PseudoMaximaEVA)" begin
-
-    Y = fill(100,3)
-
-    η = log.(Y)
-    ζ = 1/100
-
-    pdata = Pseudodata("test", collect(1:length(Y)), LogNormal.(η, ζ))
-
-    model = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
-
-    fm = PseudoMaximaEVA(model, 
-        Mamba.Chains([Y'; Y' .+ 10 ;  Y' .+ 20]), 
-        Mamba.Chains([100 log(10) -.1; 50 log(10) -.1; 150 log(10) -.1]))
-
-    ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
-    
-    @test ŷ ≈ Y
-    @test θ̂ ≈ [100, log(10), -.1]
-    
-end
 
 @testset "convert(::Type{MaximumLikelihoodEVA}, fm::PseudoMaximaEVA, iter::Int)" begin
     
@@ -44,27 +23,49 @@ end
     
 end
 
-
 @testset "dic(::PseudoMaximaEVA)" begin
+    
+    y = [90., 100., 110.]
    
-    # Test dic() with 3 maxima and 3 MCMC iterations
+    pdata = Pseudodata("y", collect(0:2), Normal.(y, 1/100))
     
-    Y = fill(100,3)
-
-    η = log.(Y)
-    ζ = 1/100
-
-    pdata = Pseudodata("test", collect(1:length(Y)), LogNormal.(η, ζ))
-
-    model = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
-
-    fm = PseudoMaximaEVA(model, 
-            Mamba.Chains([Y'; Y' .+ 10 ;  Y' .+ 20]), 
-            Mamba.Chains([100 log(10) -.1; 50 log(10) -.1; 150 log(10) -.1]))
-
-    res = 2*mean(logpdf(fm)) - logpdf(fm.model, Y, [100, log(10), -.1])
+    Y = [y' .- .1 ; y' ; y' .+ .1]
     
-    @test dic(fm) ≈ res
+    @testset "stationary model" begin
+    
+        θ = [90 log(10) -.1; 100 log(10) -.1; 110 log(10) -.1]
+
+        pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
+
+        fm = PseudoMaximaEVA(pmm, 
+            Mamba.Chains(Y), 
+            Mamba.Chains(θ))
+        
+        ŷ = [90., 100., 110.]
+        θ̂ = [100, log(10), -.1]
+
+        @test dic(fm) ≈ (2*mean(logpdf(fm)) - logpdf(fm.model, ŷ, θ̂))
+        
+    end
+    
+    @testset "nonstationary model" begin
+       
+        θ = [80 10 log(10) -.1; 90 10 log(10) -.1; 100 10 log(10) -.1]
+
+        pmm = PseudoMaximaModel([pdata], 
+            locationcov = [Variable("x", collect(0:2))],
+            prior=[Flat(), Flat(), Flat(), Flat()])
+
+        fm = PseudoMaximaEVA(pmm, 
+                Mamba.Chains(Y), 
+                Mamba.Chains(θ))
+        
+        ŷ = [90., 100., 110.]
+        θ̂ = [90, 10, log(10), -.1]
+
+    @test dic(fm) ≈ (2*mean(logpdf(fm)) - logpdf(fm.model, ŷ, θ̂))
+        
+    end
     
 end
 

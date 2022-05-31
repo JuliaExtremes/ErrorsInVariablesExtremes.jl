@@ -21,7 +21,8 @@
         V = Extremes.parametervar(eva_fm)
         δ = 3*sqrt.(diag(V))
 
-        ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
+        ŷ = vec(mean(fm.maxima.value[:,:,1], dims=1))
+        θ̂ = vec(mean(fm.parameters.value[:,:,1], dims=1))
 
         @test θ̂[1] ≈ 100 atol = δ[1]
         @test θ̂[2] ≈ log(10) atol = δ[2]
@@ -39,7 +40,8 @@
         V = Extremes.parametervar(eva_fm)
         δ = 3*sqrt.(diag(V))
 
-        ŷ, θ̂ = ErrorsInVariablesExtremes.findposteriormode(fm)
+        ŷ = vec(mean(fm.maxima.value[:,:,1], dims=1))
+        θ̂ = vec(mean(fm.parameters.value[:,:,1], dims=1))
 
         @test θ̂[1] ≈ 100 atol = δ[1]
         @test θ̂[2] ≈ log(10) atol = δ[2]
