@@ -146,300 +146,141 @@ function thin(fm::PseudoMaximaEVA, step::Int)
     
 end
 
-# Diagnostic plots
 
-"""
-    diagnosticplots(fm::PseudoMaximaEVA)
+# Diagnostic plots for a given MCMC iteration
 
-Diagnostic plots
-"""
-function diagnosticplots(fm::PseudoMaximaEVA)
+function diagnosticplots_iter(pme::PseudoMaximaEVA, iter::Int)
 
-    f1 = probplot(fm)
-    f2 = qqplot(fm)
-    f3 = histplot(fm)
+    fbm = convert(MaximumLikelihoodEVA, pme, iter)
+    
+    return diagnosticplots(fbm)
+    
+end
 
-    if ErrorsInVariablesExtremes.isstationary(fm.model)
-        f4 = returnlevelplot(fm)
-    else
-        f4 = plot()
-    end
+function histplot_iter(pme::PseudoMaximaEVA, iter::Int)
 
+    fbm = convert(MaximumLikelihoodEVA, pme, iter)
+    
+    return histplot(fbm)
+    
+end
+
+function probplot_iter(pme::PseudoMaximaEVA, iter::Int)
+
+    fbm = convert(MaximumLikelihoodEVA, pme, iter)
+    
+    return probplot(fbm)
+    
+end
+
+function qqplot_iter(pme::PseudoMaximaEVA, iter::Int)
+
+    fbm = convert(MaximumLikelihoodEVA, pme, iter)
+    
+    return qqplot(fbm)
+    
+end
+
+
+# Residual diagnostic plots
+
+function diagnosticplots(fm::PseudoMaximaEVA; step::Int=1)
+    
+    f1 = probplot(fm, step = step)
+    f2 = qqplot(fm, step = step)
+    f3 = histplot(fm, step = step)
+    f4 = plot()
+    
     return gridstack([f1 f2; f3 f4])
+    
 end
 
-function probplot(fm::PseudoMaximaEVA)
-   
-    if ErrorsInVariablesExtremes.isstationary(fm.model)
+function histplot(pme::PseudoMaximaEVA; step::Int=1)
     
-        p, y = ErrorsInVariablesExtremes.probplot_data(fm)
-        
-    else
-        
-        p, y = ErrorsInVariablesExtremes.probplot_std_data(fm)
-        
+    fm = ErrorsInVariablesExtremes.thin(pme, step)
+    
+    nsim, n, nchains = size(fm.maxima.value)
+    
+    if nsim*n > 3000
+        @warn("Consider thinning the chains to have a more manageable plot. The function `probplot()` with the optional argument `step` could be used.")
     end
     
-    ȳ = vec(mean(y, dims=1))
-    
-    plot(x=p, y=ȳ, Geom.point, 
-        Geom.abline(color="red", style=:dash),
-        Guide.xlabel("Model"), Guide.ylabel("Empirical"),
-        Guide.title("Probability Plot"))
-    
-end
+    Z = Matrix{Float64}(undef, nsim, n)
 
-function probplot_data(fm::PseudoMaximaEVA)
-   
-    nsim, n, nchain  = size(fm.maxima.value)
-
-    p = collect(1:n) / (n+1)
-    
-    y = Matrix{Float64}(undef, nsim, n)
-  
     for k in 1:nsim
-     
-        θᵢ = fm.parameters.value[k, :, 1]
-    
-        pd = ErrorsInVariablesExtremes.getdistribution(fm.model, θᵢ)
-        
-        x = sort(fm.maxima.value[k,:,1])
-    
-        y[k,:] = cdf.(pd, x)
-        
+        Z[k,:] = ErrorsInVariablesExtremes.standardize(fm.model, fm.maxima.value[k,:,1], fm.parameters.value[k,:,1])
     end
-    
-    return p, y
-    
-end
 
+    z = vec(Z)
+    
+    nbin = floor(Int64, sqrt(length(z)))
+    
+    x, p = Extremes.ecdf(z)
+    
+    xmin, xmax = quantile.(Gumbel(),[1/1000, 1-1/1000])
+    xp = range(xmin, xmax, length=1000)
 
-function probplot_std_data(fm::PseudoMaximaEVA)
+    a = repeat([0.55, 0.85], outer=nbin)
     
-    nsim, n, nchain  = size(fm.maxima.value)
-
-    p = collect(1:n)/ (n+1)
-
-    y = Matrix{Float64}(undef, nsim, n)
-   
-    for k in 1:nsim
-     
-        θᵢ = fm.parameters.value[k, :, 1]
+    h = layer(x=x, Geom.histogram(bincount=nbin, density=true), alpha=[a;a])
+    d = layer(x=xp, y=pdf.(Gumbel(), xp), Geom.line, Theme(default_color="red") )
     
-        pd = ErrorsInVariablesExtremes.getdistribution(fm.model, θᵢ)
-        
-        x = sort(fm.maxima.value[k,:,1])
-        
-        z = ErrorsInVariablesExtremes.standardize(fm.model, x, θᵢ)
-    
-        y[k,:] = cdf.(Gumbel(), z)
-        
-    end
-    
-    return p, y
-    
-end
-
-function qqplot(fm::PseudoMaximaEVA)
-    
-    if ErrorsInVariablesExtremes.isstationary(fm.model)
-    
-        x, y = ErrorsInVariablesExtremes.qqplot_data(fm)
-        
-    else
-        
-        x, y = ErrorsInVariablesExtremes.qqplot_std_data(fm)
-        
-    end
-    
-    x̄ = vec(mean(x, dims=1))
-    ȳ = vec(mean(y, dims=1))
-    
-    pmin = .9*minimum([x̄[1], ȳ[1]])
-    pmax = 1.1*maximum([x̄[end], ȳ[end]])
-
-    plot(x=x̄, y=ȳ, Geom.point, Geom.abline(color="red", style=:dash),
-        Guide.xlabel("Model"), Guide.ylabel("Empirical"),
-        Coord.cartesian(xmin=pmin, ymin=pmin),
-        Guide.title("Quantile-Quantile Plot"))
-    
-end
-
-function qqplot_data(fm::PseudoMaximaEVA)
-    
-    nsim, n, nchain  = size(fm.maxima.value)
-
-    p = collect(1:n) / (n+1)
-
-    x = Matrix{Float64}(undef, nsim, n)
-    y = Matrix{Float64}(undef, nsim, n)
-   
-    for k in 1:nsim
-   
-        x[k,:] = sort(fm.maxima.value[k,:,1])
-    
-        θᵢ = fm.parameters.value[k, :, 1]
-    
-        pd = ErrorsInVariablesExtremes.getdistribution(fm.model, θᵢ)
-    
-        y[k,:] = quantile.(pd, p)
-        
-    end
-    
-    return x, y
-    
-end
-
-function qqplot_std_data(fm::PseudoMaximaEVA)
-    
-    nsim, n, nchain  = size(fm.maxima.value)
-
-    p = collect(1:n)/ (n+1)
-
-    z = Matrix{Float64}(undef, nsim, n)
-    y = Matrix{Float64}(undef, nsim, n)
-   
-    for k in 1:nsim
-       
-        θᵢ = fm.parameters.value[k, :, 1]
-        
-        x = sort(fm.maxima.value[k,:,1])
-        
-        z[k, :] = ErrorsInVariablesExtremes.standardize(fm.model, x, θᵢ)
-    
-        y[k,:] = quantile.(Gumbel(), p)
-        
-    end
-    
-    return z, y
-    
-end
-
-function histplot(fm::PseudoMaximaEVA)
-
-    if ErrorsInVariablesExtremes.isstationary(fm.model)
-    
-        x, xp, y = ErrorsInVariablesExtremes.histplot_data(fm)
-        
-    else
-        
-        x, xp, y = ErrorsInVariablesExtremes.histplot_std_data(fm)
-        
-    end
-    
-    x̄ = vec(mean(x, dims=1))
-    ȳ = vec(mean(y, dims=1))
-    
-    nbin = floor(Int64, sqrt(size(x,2 )))
-
-    h = layer(x=x̄, Geom.histogram(bincount = nbin, density=true))
-    d = layer(x=xp, y=ȳ, Geom.line, Theme(default_color="red") )
-
     plot(d,h, 
         Coord.cartesian(xmin = xp[1], xmax = xp[end]),
         Guide.xlabel("Data"), Guide.ylabel("Density"),
-        Guide.title("Density plot"))
+        Guide.title("Residual density plot"))
     
 end
 
-function histplot_data(fm::PseudoMaximaEVA)
-   
-    nsim, n, nchain  = size(fm.maxima.value)
+function probplot(pme::PseudoMaximaEVA; step::Int=1)
     
-    xmin = quantile(fm.maxima.value[:], 1/1000)
-    xmax = quantile(fm.maxima.value[:], 1 - 1/1000)
-    xp = range(xmin, xmax, length=1000)
+    fm = ErrorsInVariablesExtremes.thin(pme, step)
     
-    x = Matrix{Float64}(undef, nsim, n)
-    y = Matrix{Float64}(undef, nsim, length(xp))
+    nsim, n, nchains = size(fm.maxima.value)
     
-    for k in 1:nsim
-     
-        x[k, :] = sort(fm.maxima.value[k, :, 1]) 
-        
-        θᵢ = fm.parameters.value[k, :, 1]
-    
-        pd = ErrorsInVariablesExtremes.getdistribution(fm.model, θᵢ)[]
-        
-        y[k,:] = pdf.(pd, xp)
-        
+    if nsim*n > 3000
+        @warn("Consider thinning the chains to have a more manageable plot. The function `probplot()` with the optional argument `step` could be used.")
     end
     
-    return x, xp, y
-    
-end
+    Z = Matrix{Float64}(undef, nsim, n)
 
-function histplot_std_data(fm::PseudoMaximaEVA)
-   
-    nsim, n, nchain  = size(fm.maxima.value)
-    
-    xmin = quantile(Gumbel(), 1/1000)
-    xmax = quantile(Gumbel(), 1 - 1/1000)
-    xp = range(xmin, xmax, length=1000)
-    
-    z = Matrix{Float64}(undef, nsim, n)
-    y = Matrix{Float64}(undef, nsim, length(xp))
-    
     for k in 1:nsim
-     
-        θᵢ = fm.parameters.value[k, :, 1]
-        
-        x = sort(fm.maxima.value[k, :, 1])
-        
-        z[k,:] = ErrorsInVariablesExtremes.standardize(fm.model, x, θᵢ)
-        
-        y[k,:] = pdf.(Gumbel(), xp)
-        
+        Z[k,:] = ErrorsInVariablesExtremes.standardize(fm.model, fm.maxima.value[k,:,1], fm.parameters.value[k,:,1])
     end
+
+    z = vec(Z)
     
-    return z, xp, y
-    
-end
+    y, p = Extremes.ecdf(z)
 
-function returnlevelplot(fm::PseudoMaximaEVA)
-    
-    @assert ErrorsInVariablesExtremes.isstationary(fm.model) "The model should be stationary."
-    
-    T, x, y = ErrorsInVariablesExtremes.returnlevelplot_data(fm)
-
-    x̄ = vec(mean(x, dims=1))
-    ȳ = vec(mean(y, dims=1))
-
-    l1 = layer(x=T, y=ȳ, Geom.line, Theme(default_color="red", line_style=[:dash]))
-    l2 = layer(x=T, y=x̄, Geom.point)
-
-
-    plot(l1,l2, Scale.x_log10, Guide.xlabel("Return Period"), Guide.ylabel("Return Level"),
-                Guide.title("Return Level Plot"), Theme(discrete_highlight_color=c->nothing))
+    plot(x=cdf.(Gumbel(),y), y=p, Geom.point, 
+        Geom.abline(color="red", style=:dash),
+        Guide.xlabel("Model"), Guide.ylabel("Empirical"), Guide.title("Residual probability plot"),
+            Theme(discrete_highlight_color=c->nothing))
     
 end
 
+function qqplot(pme::PseudoMaximaEVA; step::Int=1)
 
-function returnlevelplot_data(fm::PseudoMaximaEVA)
+    fm = ErrorsInVariablesExtremes.thin(pme, step)
+        
+    nsim, n, nchains = size(fm.maxima.value)
+    
+    if nsim*n > 3000
+        @warn("Consider thinning the chains to have a more manageable plot. The function `probplot()` with the optional argument `step` could be used.")
+    end
 
-    nsim, n, nchain  = size(fm.maxima.value)
+    Z = Matrix{Float64}(undef, nsim, n)
 
-    p = collect(1:n)/ (n+1)  
-    
-    T = 1 ./ (1 .- p)
-    
-    x = Matrix{Float64}(undef, nsim, n)
-    y = Matrix{Float64}(undef, nsim, n)
-    
     for k in 1:nsim
-     
-        x[k, :] = sort(fm.maxima.value[k, :, 1]) 
-        
-        θᵢ = fm.parameters.value[k, :, 1]
-    
-        pd = ErrorsInVariablesExtremes.getdistribution(fm.model, θᵢ)
-        
-        y[k,:] = quantile.(pd, p)
-        
+        Z[k,:] = ErrorsInVariablesExtremes.standardize(fm.model, fm.maxima.value[k,:,1], fm.parameters.value[k,:,1])
     end
+
+    z = vec(Z)
+    y, p = Extremes.ecdf(z)
+
+    plot(x=quantile.(Gumbel(),p), y=y, Geom.point, 
+        Geom.abline(color="red", style=:dash),
+        Guide.xlabel("Model"), Guide.ylabel("Empirical"), Guide.title("Residual quantile-quantile plot"),
+            Theme(discrete_highlight_color=c->nothing))
     
-    return T, x, y
-
 end
-
-
