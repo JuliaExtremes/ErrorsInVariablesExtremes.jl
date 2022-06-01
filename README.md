@@ -1,4 +1,4 @@
-# Extreme value analysis for errors-in-variables models.
+# Extreme value analysis for errors-in-variables models
 
 
 [![WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
@@ -24,4 +24,4 @@ julia> import Pkg
 julia> Pkg.add("https://github.com/JuliaExtremes/ErrorsInVariablesExtremes.jl")
 ```
 
-See the [Package Documentation](https://juliaextremes.github.io/ErrorsInVariablesExtremes.jl/stable/) for details and examples. The Tutorial section illustrates the package functionalities by producing an extreme value analysis of unobserved riverflows for a section of the Chaudière River in Québec, Canada.
+See the [Package Documentation](https://juliaextremes.github.io/ErrorsInVariablesExtremes.jl/stable/) for details and examples.
