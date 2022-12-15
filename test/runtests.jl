@@ -2,7 +2,7 @@ using DataFrames, Dates, NetCDF
 using Distributions, ErrorsInVariablesExtremes, Extremes
 using Test
 using LinearAlgebra, Random
-using Mamba
+using MambaLite
 using Statistics
 
 # Set the seed for reproductible test results
