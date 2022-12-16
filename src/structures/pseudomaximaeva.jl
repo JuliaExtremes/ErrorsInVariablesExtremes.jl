@@ -1,5 +1,5 @@
 """
-    PseudoMaximaEVA(pseudodata::Pseudoensemble, model::EVA, sim::Mamba.Chains)
+    PseudoMaximaEVA(pseudodata::Pseudoensemble, model::EVA, sim::MambaLite.Chains)
 
 Construct a PseudoMaximaEVA type.
 
@@ -12,8 +12,8 @@ Encapsulates the probability distributions for each of the unobserved data for a
 """
 struct PseudoMaximaEVA
     model::PseudoMaximaModel
-    maxima::Mamba.Chains
-    parameters::Mamba.Chains
+    maxima::MambaLite.Chains
+    parameters::MambaLite.Chains
 end
 
 Base.Broadcast.broadcastable(obj::PseudoMaximaEVA) = Ref(obj)

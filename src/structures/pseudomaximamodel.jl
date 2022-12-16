@@ -218,10 +218,10 @@ function fitbayes(model::PseudoMaximaModel;
         push!(paramnames, "ξ")
     end
     
-    maxima_chain = Mamba.Chains(collect(Y'), names=["Y[$j]" for j = 1:n])
+    maxima_chain = MambaLite.Chains(collect(Y'), names=["Y[$j]" for j = 1:n])
     maxima_chain = maxima_chain[warmup:thin:niter, :,:]
 
-    parameters_chain = Mamba.Chains(collect(params'), names=paramnames)
+    parameters_chain = MambaLite.Chains(collect(params'), names=paramnames)
     parameters_chain = parameters_chain[warmup:thin:niter, :,:]
     
     return PseudoMaximaEVA(model, maxima_chain, parameters_chain)

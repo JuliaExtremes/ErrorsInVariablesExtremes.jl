@@ -13,8 +13,8 @@
     pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
     
     fm = PseudoMaximaEVA(pmm, 
-        Mamba.Chains(Y), 
-        Mamba.Chains(θ))
+        MambaLite.Chains(Y), 
+        MambaLite.Chains(θ))
     
     res = convert(MaximumLikelihoodEVA, fm, 2)
     
@@ -38,8 +38,8 @@ end
         pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
 
         fm = PseudoMaximaEVA(pmm, 
-            Mamba.Chains(Y), 
-            Mamba.Chains(θ))
+            MambaLite.Chains(Y), 
+            MambaLite.Chains(θ))
         
         ŷ = [90., 100., 110.]
         θ̂ = [100, log(10), -.1]
@@ -57,8 +57,8 @@ end
             prior=[Flat(), Flat(), Flat(), Flat()])
 
         fm = PseudoMaximaEVA(pmm, 
-                Mamba.Chains(Y), 
-                Mamba.Chains(θ))
+                MambaLite.Chains(Y), 
+                MambaLite.Chains(θ))
         
         ŷ = [90., 100., 110.]
         θ̂ = [90, 10, log(10), -.1]
@@ -84,8 +84,8 @@ end
         pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
 
         fm = PseudoMaximaEVA(pmm, 
-            Mamba.Chains(Y), 
-            Mamba.Chains(θ))
+            MambaLite.Chains(Y), 
+            MambaLite.Chains(θ))
 
         @test ErrorsInVariablesExtremes.getdistribution(fm, 2)[] ==
             GeneralizedExtremeValue(θ[2,1], exp(θ[2,2]), θ[2,3])
@@ -104,8 +104,8 @@ end
             prior=[Flat(), Flat(), Flat(), Flat()])
 
         fm = PseudoMaximaEVA(pmm, 
-                Mamba.Chains(Y), 
-                Mamba.Chains(θ))
+                MambaLite.Chains(Y), 
+                MambaLite.Chains(θ))
 
         μ = θ[:,1] .+ θ[:,2].*collect(0:2)'
         σ = exp.(θ[:,3])
@@ -133,8 +133,8 @@ end
     model = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
 
     fm = PseudoMaximaEVA(model, 
-            Mamba.Chains([Y'; Y' .+ 10 ;  Y' .+ 20]), 
-            Mamba.Chains([100 log(10) -.1; 50 log(10) -.1; 150 log(10) -.1]))
+            MambaLite.Chains([Y'; Y' .+ 10 ;  Y' .+ 20]), 
+            MambaLite.Chains([100 log(10) -.1; 50 log(10) -.1; 150 log(10) -.1]))
     
     res = logpdf(fm)
     
@@ -159,8 +159,8 @@ end
         pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
 
         fm = PseudoMaximaEVA(pmm, 
-            Mamba.Chains(Y), 
-            Mamba.Chains(θ))
+            MambaLite.Chains(Y), 
+            MambaLite.Chains(θ))
         
         μ = θ[:,1]
         σ = exp.(θ[:,2])
@@ -181,8 +181,8 @@ end
             prior=[Flat(), Flat(), Flat(), Flat()])
 
         fm = PseudoMaximaEVA(pmm, 
-                Mamba.Chains(Y), 
-                Mamba.Chains(θ))
+                MambaLite.Chains(Y), 
+                MambaLite.Chains(θ))
 
         μ = θ[:,1] .+ θ[:,2].*collect(0:2)'
         σ = exp.(θ[:,3])
@@ -210,8 +210,8 @@ end
     pmm = PseudoMaximaModel([pdata], prior=[Flat(), Flat(), Flat()])
     
     fm = PseudoMaximaEVA(pmm, 
-        Mamba.Chains(Y), 
-        Mamba.Chains(θ))
+        MambaLite.Chains(Y), 
+        MambaLite.Chains(θ))
     
     res = ErrorsInVariablesExtremes.thin(fm, 2)
     
