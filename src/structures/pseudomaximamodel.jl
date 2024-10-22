@@ -23,7 +23,7 @@ function PseudoMaximaModel(data::Vector{Pseudodata};
     n = length(data[1].value)
     y = Vector{Float64}(undef, n)
     
-    emptymodel = BlockMaxima(Variable("y", y),
+    emptymodel = BlockMaxima{GeneralizedExtremeValue}(Variable("y", y),
         locationcov = locationcov,
         logscalecov = logscalecov,
         shapecov = shapecov)
@@ -92,7 +92,7 @@ function fitbayes(model::PseudoMaximaModel;
 
     y₀ = Variable("pdata", ensemblemean(pdata))
 
-    data_layer = BlockMaxima(y₀,
+    data_layer = BlockMaxima{GeneralizedExtremeValue}(y₀,
         model.location,
         model.logscale,
         model.shape)
@@ -148,7 +148,7 @@ function fitbayes(model::PseudoMaximaModel;
         end
     
     
-        data_layer = BlockMaxima(Variable("y", Y[:, iter]),
+        data_layer = BlockMaxima{GeneralizedExtremeValue}(Variable("y", Y[:, iter]),
             model.location,
             model.logscale,
             model.shape)
@@ -218,10 +218,10 @@ function fitbayes(model::PseudoMaximaModel;
         push!(paramnames, "ξ")
     end
     
-    maxima_chain = Mamba.Chains(collect(Y'), names=["Y[$j]" for j = 1:n])
+    maxima_chain = MambaLite.Chains(collect(Y'), names=["Y[$j]" for j = 1:n])
     maxima_chain = maxima_chain[warmup:thin:niter, :,:]
 
-    parameters_chain = Mamba.Chains(collect(params'), names=paramnames)
+    parameters_chain = MambaLite.Chains(collect(params'), names=paramnames)
     parameters_chain = parameters_chain[warmup:thin:niter, :,:]
     
     return PseudoMaximaEVA(model, maxima_chain, parameters_chain)
@@ -235,7 +235,7 @@ Return the underlying extreme value distribution of `pmm` with parameters `θ`.
 """
 function getdistribution(pmm::PseudoMaximaModel, θ::AbstractVector{<:Real})
    
-    bmm = BlockMaxima(Variable("empty", Float64[]),
+    bmm = BlockMaxima{GeneralizedExtremeValue}(Variable("empty", Float64[]),
         pmm.location,
         pmm.logscale,
         pmm.shape)
@@ -251,7 +251,7 @@ Check if the underlying extreme value model of the PseusoMaximaModel `model` is 
 """
 function isstationary(model::PseudoMaximaModel)
    
-    bm = Extremes.BlockMaxima(Variable("y",Float64[]),
+    bm = Extremes.BlockMaxima{GeneralizedExtremeValue}(Variable("y",Float64[]),
         model.location,
         model.logscale,
         model.shape)
@@ -269,7 +269,7 @@ function logpdf(fm::PseudoMaximaModel, y::Vector{<:Real}, θ::Vector{<:Real})
     
     ℓ₁ = sum(logpdf(fm.datadistribution, y))
     
-    evmodel = BlockMaxima(Variable("y", y),
+    evmodel = BlockMaxima{GeneralizedExtremeValue}(Variable("y", y),
         fm.location,
         fm.logscale,
         fm.shape)
