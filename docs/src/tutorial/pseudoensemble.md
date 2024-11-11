@@ -10,7 +10,7 @@ using ErrorsInVariablesExtremes, Extremes, Dates, DataFrames, Distributions, Gad
 
 Loading the pseudo-observations into an object of type [`Pseudoensemble`](@ref):
 ```@example chaudiere
-filename = "../../../test/data/A2020_Analyse_Historique_QMA_SLSO00003.nc"
+filename = "../../../data/QMA_SLSO00003.nc"
 pensemble = ErrorsInVariablesExtremes.load_discharge_distribution(filename)
 ```
 
