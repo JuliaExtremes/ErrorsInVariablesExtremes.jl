@@ -1,5 +1,5 @@
 """
-    PseudoMaximaEVA(pseudodata::Pseudoensemble, model::EVA, sim::Mamba.Chains)
+    PseudoMaximaEVA(pseudodata::Pseudoensemble, model::EVA, sim::MambaLite.Chains)
 
 Construct a PseudoMaximaEVA type.
 
@@ -12,8 +12,8 @@ Encapsulates the probability distributions for each of the unobserved data for a
 """
 struct PseudoMaximaEVA
     model::PseudoMaximaModel
-    maxima::Mamba.Chains
-    parameters::Mamba.Chains
+    maxima::MambaLite.Chains
+    parameters::MambaLite.Chains
 end
 
 Base.Broadcast.broadcastable(obj::PseudoMaximaEVA) = Ref(obj)
@@ -43,12 +43,12 @@ end
 
 Convert a single MCMC iteration of the fm model to a pseudo MaximumLikelihoodEVA for hacking Extremes.jl methods. 
 """
-function convert(::Type{MaximumLikelihoodEVA}, fm::PseudoMaximaEVA, iter::Int)
+function convert(::Type{MaximumLikelihoodAbstractExtremeValueModel}, fm::PseudoMaximaEVA, iter::Int)
     
-        bm = BlockMaxima(Variable("y", fm.maxima.value[iter, :, 1]),
+        bm = BlockMaxima{GeneralizedExtremeValue}(Variable("y", fm.maxima.value[iter, :, 1]),
         fm.model.location, fm.model.logscale, fm.model.shape)
 
-        return MaximumLikelihoodEVA(bm, fm.parameters.value[iter, :, 1])
+        return MaximumLikelihoodAbstractExtremeValueModel(bm, fm.parameters.value[iter, :, 1])
     
 end
 

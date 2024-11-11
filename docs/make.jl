@@ -3,7 +3,8 @@ using Documenter, ErrorsInVariablesExtremes, Extremes, DataFrames
 makedocs(sitename="ErrorsInVariablesExtremes.jl",
 		 pages = ["index.md",
 				  "Tutorial" =>["Getting started" => "tutorial/index.md",
-								"Unobserved riverflows analysis" => "tutorial/riverflows.md"],
+								"Pseudoensemble" => "tutorial/pseudoensemble.md",
+								"Analysis of estimated discharges" => "tutorial/analysis.md"],
 				  "functions.md"])
 
 deploydocs(repo = "github.com/JuliaExtremes/ErrorsInVariablesExtremes.jl.git",
