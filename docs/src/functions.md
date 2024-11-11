@@ -16,7 +16,7 @@ fitbayes
 ## Methods for fitted models
 
 ```@docs
-convert(::Type{MaximumLikelihoodEVA}, ::PseudoMaximaEVA, ::Int)
+convert(::Type{MaximumLikelihoodAbstractExtremeValueModel}, ::PseudoMaximaEVA, ::Int)
 dic
 ```
 
