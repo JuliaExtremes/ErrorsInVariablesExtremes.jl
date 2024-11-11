@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Analysis of estimated discharges · ErrorsInVariablesExtremes.jl</title><meta name="title" content="Analysis of estimated discharges · ErrorsInVariablesExtremes.jl"/><meta property="og:title" content="Analysis of estimated discharges · ErrorsInVariablesExtremes.jl"/><meta property="twitter:title" content="Analysis of estimated discharges · ErrorsInVariablesExtremes.jl"/><meta name="description" content="Documentation for ErrorsInVariablesExtremes.jl."/><meta property="og:description" content="Documentation for ErrorsInVariablesExtremes.jl."/><meta property="twitter:description" content="Documentation for ErrorsInVariablesExtremes.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">ErrorsInVariablesExtremes.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Extreme value analysis for error in variables models.</a></li><li><span class="tocitem">Tutorial</span><ul><li><a class="tocitem" href="../">Getting started</a></li><li><a class="tocitem" href="../pseudoensemble/">Pseudoensemble</a></li><li class="is-active"><a class="tocitem" href>Analysis of estimated discharges</a><ul class="internal"><li><a class="tocitem" href="#Load-the-data"><span>Load the data</span></a></li><li><a class="tocitem" href="#Combination-of-the-hydrological-configurations-for-the-log-discharges"><span>Combination of the hydrological configurations for the log-discharges</span></a></li><li><a class="tocitem" href="#Stationary-model"><span>Stationary model</span></a></li><li><a class="tocitem" href="#Non-stationary-model"><span>Non-stationary model</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../functions/">Functions</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorial</a></li><li class="is-active"><a href>Analysis of estimated discharges</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Analysis of estimated discharges</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaExtremes/ErrorsInVariablesExtremes.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaExtremes/ErrorsInVariablesExtremes.jl/blob/master/docs/src/tutorial/analysis.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Bayesian-analysis-of-the-estimated-discharges"><a class="docs-heading-anchor" href="#Bayesian-analysis-of-the-estimated-discharges">Bayesian analysis of the estimated discharges</a><a id="Bayesian-analysis-of-the-estimated-discharges-1"></a><a class="docs-heading-anchor-permalink" href="#Bayesian-analysis-of-the-estimated-discharges" title="Permalink"></a></h1><h2 id="Load-the-data"><a class="docs-heading-anchor" href="#Load-the-data">Load the data</a><a id="Load-the-data-1"></a><a class="docs-heading-anchor-permalink" href="#Load-the-data" title="Permalink"></a></h2><p>Loading the pseudo-observations into an object of type <a href="../pseudoensemble/#Pseudoensemble"><code>Pseudoensemble</code></a>:</p><pre><code class="language-julia hljs">filename = &quot;SLSO00003&quot;
+pdata = ErrorsInVariablesExtremes.load_discharge_distribution(filename)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">6-element Vector{Pseudodata}:
+ Pseudodata:
+  name: LN24HA
+  year: Vector{Int64}[60]
+  value:Vector{Distributions.LogNormal{Float64}}[60]
+
+ Pseudodata:
+  name: MG24HA
+  year: Vector{Int64}[60]
+  value:Vector{Distributions.LogNormal{Float64}}[60]
+
+ Pseudodata:
+  name: MG24HI
+  year: Vector{Int64}[60]
+  value:Vector{Distributions.LogNormal{Float64}}[60]
+
+ Pseudodata:
+  name: MG24HK
+  year: Vector{Int64}[60]
+  value:Vector{Distributions.LogNormal{Float64}}[60]
+
+ Pseudodata:
+  name: MG24HQ
+  year: Vector{Int64}[60]
+  value:Vector{Distributions.LogNormal{Float64}}[60]
+
+ Pseudodata:
+  name: MG24HS
+  year: Vector{Int64}[60]
+  value:Vector{Distributions.LogNormal{Float64}}[60]
+</code></pre><p>Converting in DataFrame:</p><pre><code class="language-julia hljs">df = convert(DataFrame, pdata)
+first(df,5)</code></pre><div><div style = "float: left;"><span>5×3 DataFrame</span></div><div style = "clear: both;"></div></div><div class = "data-frame" style = "overflow-x: scroll;"><table class = "data-frame" style = "margin-bottom: 6px;"><thead><tr class = "header"><th class = "rowNumber" style = "font-weight: bold; text-align: right;">Row</th><th style = "text-align: left;">Year</th><th style = "text-align: left;">Configuration</th><th style = "text-align: left;">Distribution</th></tr><tr class = "subheader headerLastRow"><th class = "rowNumber" style = "font-weight: bold; text-align: right;"></th><th title = "Int64" style = "text-align: left;">Int64</th><th title = "String" style = "text-align: left;">String</th><th title = "Distributions.Distribution{Distributions.Univariate, Distributions.Continuous}" style = "text-align: left;">Distribu…</th></tr></thead><tbody><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">1</td><td style = "text-align: right;">1961</td><td style = "text-align: left;">LN24HA</td><td style = "text-align: left;">Distributions.LogNormal{Float64}(μ=6.74475, σ=0.328861)</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">2</td><td style = "text-align: right;">1962</td><td style = "text-align: left;">LN24HA</td><td style = "text-align: left;">Distributions.LogNormal{Float64}(μ=6.66903, σ=0.60999)</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">3</td><td style = "text-align: right;">1963</td><td style = "text-align: left;">LN24HA</td><td style = "text-align: left;">Distributions.LogNormal{Float64}(μ=7.12515, σ=0.640745)</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">4</td><td style = "text-align: right;">1964</td><td style = "text-align: left;">LN24HA</td><td style = "text-align: left;">Distributions.LogNormal{Float64}(μ=7.12626, σ=0.484738)</td></tr><tr><td class = "rowNumber" style = "font-weight: bold; text-align: right;">5</td><td style = "text-align: right;">1965</td><td style = "text-align: left;">LN24HA</td><td style = "text-align: left;">Distributions.LogNormal{Float64}(μ=6.38777, σ=0.461077)</td></tr></tbody></table></div><h2 id="Combination-of-the-hydrological-configurations-for-the-log-discharges"><a class="docs-heading-anchor" href="#Combination-of-the-hydrological-configurations-for-the-log-discharges">Combination of the hydrological configurations for the log-discharges</a><a id="Combination-of-the-hydrological-configurations-for-the-log-discharges-1"></a><a class="docs-heading-anchor-permalink" href="#Combination-of-the-hydrological-configurations-for-the-log-discharges" title="Permalink"></a></h2><p>See Eq. (11) and (12) of the paper.</p><pre><code class="language-julia hljs">df[:,:η] = first.(params.(df.Distribution))
+df[:,:ζ] = last.(params.(df.Distribution))
+
+m = Float64[]
+s = Float64[]
+
+for iYear in unique(df.Year)
+
+    df3 = filter(row -&gt; row.Year==iYear, df)
+    mᵢ = sum(df3.η ./ df3.ζ.^2) / sum( 1 ./df3.ζ.^2)
+    sᵢ = sqrt(1/sum( 1 ./df3.ζ.^2))
+
+    push!(m, mᵢ)
+    push!(s, sᵢ)
+
+end
+
+pdata[1].year
+
+datadist = Pseudodata(&quot;Combined&quot;,pdata[1].year ,Normal.(m, s))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Pseudodata:
+  name: Combined
+  year: Vector{Int64}[60]
+  value:Vector{Distributions.Normal{Float64}}[60]
+</code></pre><h2 id="Stationary-model"><a class="docs-heading-anchor" href="#Stationary-model">Stationary model</a><a id="Stationary-model-1"></a><a class="docs-heading-anchor-permalink" href="#Stationary-model" title="Permalink"></a></h2><h3 id="Specifying-the-stationary-extreme-value-Bayesian-model"><a class="docs-heading-anchor" href="#Specifying-the-stationary-extreme-value-Bayesian-model">Specifying the stationary extreme value Bayesian model</a><a id="Specifying-the-stationary-extreme-value-Bayesian-model-1"></a><a class="docs-heading-anchor-permalink" href="#Specifying-the-stationary-extreme-value-Bayesian-model" title="Permalink"></a></h3><p>The stationary model used the combined estimates of discharges and a semi-informative prior.</p><pre><code class="language-julia hljs">model1 = PseudoMaximaModel([datadist], prior=[Flat(), Flat(), LocationScale(-.5, 1, Beta(6,9))])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PseudoMaximaModel
+  datadistribution: Vector{Pseudodata}[1]
+  location: μ ~ 1
+  logscale: ϕ ~ 1
+  shape: ξ ~ 1
+  prior: [Extremes.Flat(), Extremes.Flat(), Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}(
+μ: -0.5
+σ: 1.0
+ρ: Distributions.Beta{Float64}(α=6.0, β=9.0)
+)
+]
+</code></pre><h3 id="MCMC"><a class="docs-heading-anchor" href="#MCMC">MCMC</a><a id="MCMC-1"></a><a class="docs-heading-anchor-permalink" href="#MCMC" title="Permalink"></a></h3><pre><code class="language-julia hljs">fm1 = fitbayes(model1, niter=20000, warmup=10001, thin=10, δₒ = .5)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PseudoMaximaEVA
+   model: PseudoMaximaModel
+   maxima:
+		MambaLite.Chains
+		Iterations :		10001:19991
+		Thinning interval :	10
+		Chains :		1
+		Samples per chain :	1000
+		Value :			Array{Float64, 3}[1000,60,1]
+   parameters:
+		MambaLite.Chains
+		Iterations :		10001:19991
+		Thinning interval :	10
+		Chains :		1
+		Samples per chain :	1000
+		Value :			Array{Float64, 3}[1000,3,1]
+</code></pre><h3 id="Traces-of-the-parameters"><a class="docs-heading-anchor" href="#Traces-of-the-parameters">Traces of the parameters</a><a id="Traces-of-the-parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Traces-of-the-parameters" title="Permalink"></a></h3><p>Trace of the GEV parameters:</p><pre><code class="language-julia hljs">fig1 = plot(y=fm1.parameters.value[:,1], Geom.line,
+    Guide.xlabel(&quot;Iteration&quot;), Guide.ylabel(&quot;μ&quot;));
+
+fig2 = plot(y=exp.(fm1.parameters.value[:,2]), Geom.line,
+    Guide.xlabel(&quot;Iteration&quot;), Guide.ylabel(&quot;σ&quot;));
+
+fig3 = plot(y=fm1.parameters.value[:,3], Geom.line,
+    Guide.xlabel(&quot;Iteration&quot;), Guide.ylabel(&quot;ξ&quot;));
+
+set_default_plot_size(24cm, 12cm)
+gridstack([fig1 fig2;
+    fig3 Gadfly.plot()])</code></pre><img src="bd323d66.svg" alt="Example block output"/><h2 id="Non-stationary-model"><a class="docs-heading-anchor" href="#Non-stationary-model">Non-stationary model</a><a id="Non-stationary-model-1"></a><a class="docs-heading-anchor-permalink" href="#Non-stationary-model" title="Permalink"></a></h2><h3 id="Specifying-the-non-stationary-extreme-value-Bayesian-model"><a class="docs-heading-anchor" href="#Specifying-the-non-stationary-extreme-value-Bayesian-model">Specifying the non-stationary extreme value Bayesian model</a><a id="Specifying-the-non-stationary-extreme-value-Bayesian-model-1"></a><a class="docs-heading-anchor-permalink" href="#Specifying-the-non-stationary-extreme-value-Bayesian-model" title="Permalink"></a></h3><p>The non-stationary model used the combined estimates of discharges and a semi-informative prior. The GEV location parameter is function of the year.</p><pre><code class="language-julia hljs">t = collect(0:59)
+
+covariate = Variable(&quot;t&quot;, t );
+
+model2 = PseudoMaximaModel([datadist], locationcov = [covariate],
+    prior=[Flat(), Flat(), Flat(),  LocationScale(-.5, 1, Beta(6,9))])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PseudoMaximaModel
+  datadistribution: Vector{Pseudodata}[1]
+  location: μ ~ 1 + t
+  logscale: ϕ ~ 1
+  shape: ξ ~ 1
+  prior: [Extremes.Flat(), Extremes.Flat(), Extremes.Flat(), Distributions.LocationScale{Float64, Distributions.Continuous, Distributions.Beta{Float64}}(
+μ: -0.5
+σ: 1.0
+ρ: Distributions.Beta{Float64}(α=6.0, β=9.0)
+)
+]
+</code></pre><h3 id="MCMC-2"><a class="docs-heading-anchor" href="#MCMC-2">MCMC</a><a class="docs-heading-anchor-permalink" href="#MCMC-2" title="Permalink"></a></h3><pre><code class="language-julia hljs">fm2 = fitbayes(model2, niter=20000, warmup=10001, thin=10, δₒ = .5);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PseudoMaximaEVA
+   model: PseudoMaximaModel
+   maxima:
+		MambaLite.Chains
+		Iterations :		10001:19991
+		Thinning interval :	10
+		Chains :		1
+		Samples per chain :	1000
+		Value :			Array{Float64, 3}[1000,60,1]
+   parameters:
+		MambaLite.Chains
+		Iterations :		10001:19991
+		Thinning interval :	10
+		Chains :		1
+		Samples per chain :	1000
+		Value :			Array{Float64, 3}[1000,4,1]
+</code></pre><h3 id="Traces-of-the-parameters-2"><a class="docs-heading-anchor" href="#Traces-of-the-parameters-2">Traces of the parameters</a><a class="docs-heading-anchor-permalink" href="#Traces-of-the-parameters-2" title="Permalink"></a></h3><p>Trace of the GEV parameters:</p><pre><code class="language-julia hljs">fig1 = plot(y=fm2.parameters.value[:,1], Geom.line,
+    Guide.xlabel(&quot;Iteration&quot;), Guide.ylabel(&quot;μ&lt;sub&gt;0&lt;/sub&gt;&quot;));
+
+fig2 = plot(y=fm2.parameters.value[:,2], Geom.line,
+    Guide.xlabel(&quot;Iteration&quot;), Guide.ylabel(&quot;μ&lt;sub&gt;1&lt;/sub&gt;&quot;));
+
+fig3 = plot(y=exp.(fm2.parameters.value[:,3]), Geom.line,
+    Guide.xlabel(&quot;Iteration&quot;), Guide.ylabel(&quot;σ&quot;));
+
+fig4 = plot(y=fm2.parameters.value[:,4], Geom.line,
+    Guide.xlabel(&quot;Iteration&quot;), Guide.ylabel(&quot;ξ&quot;));
+
+set_default_plot_size(24cm, 12cm)
+gridstack([fig1 fig2;
+    fig3 fig4])</code></pre><img src="12b0205d.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../pseudoensemble/">« Pseudoensemble</a><a class="docs-footer-nextpage" href="../../functions/">Functions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Monday 11 November 2024 16:21">Monday 11 November 2024</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
