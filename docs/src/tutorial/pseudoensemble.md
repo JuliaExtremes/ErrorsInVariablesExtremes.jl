@@ -10,13 +10,13 @@ using ErrorsInVariablesExtremes, Extremes, Dates, DataFrames, Distributions, Gad
 
 Loading the pseudo-observations into an object of type [`Pseudoensemble`](@ref):
 ```@example chaudiere
-filename = "../../../data/QMA_SLSO00003.nc"
+filename = "SLSO00003"
 pensemble = ErrorsInVariablesExtremes.load_discharge_distribution(filename)
 ```
 
 The vector of years can be extracted:
 ```@example chaudiere
-years = pensemble.value[1].year;
+years = pensemble[1].year;
 ```
 
 ## Convert to DataFrame
@@ -27,37 +27,43 @@ df = convert(DataFrame, pensemble)
 first(df,5)
 ```
 
-## Compute the mean and the 1-α confidence interval for each of the configurations
-
+## Extracting the statistics
 ```@example chaudiere
+# Interval confidence level
 α = 0.5
 
-df[:, :y] = mean.(df.Distribution)
+# Median
+df[:, :y] = median.(df.Distribution)
+
+# Lower bound of the confidence interval
 df[:, :ymin] = quantile.(df.Distribution, α/2)
+
+# Upper bound of the confidence interval
 df[:, :ymax] = quantile.(df.Distribution, 1-α/2)
 
 first(df, 5)
+```
+
+
+## Display the discharge of one specific configuration
+
+
+```@example chaudiere
+config = "LN24HA"
+df2 = filter(row -> row.Configuration ==config, df)
+
+set_default_plot_size(12cm, 8cm)
+plot(df2, x=:Year, y=:y, Geom.line, Geom.point,
+    ymin=:ymin, ymax=:ymax, Geom.ribbon,
+    Guide.ylabel("Discharge [m³/s]"),
+    Guide.title(config))
 ```
 
 ## Display the discharge of all configurations
 
 ```@example chaudiere
 set_default_plot_size(12cm, 8cm)
-plot(df, x=:Year, y=:y, color=:Configuration, Geom.line,
-    ymin=:ymin, ymax=:ymax, Geom.ribbon,
-    Guide.ylabel("Discharge [m³/s]"))
-```
-
-
-## Display the discharge of one specific configuration
-
-```@example chaudiere
-config = "MG24HQ"
-
-df2 = filter(row -> row.Configuration ==config, df)
-
-set_default_plot_size(12cm, 8cm)
-plot(df2, x=:Year, y=:y, Geom.line,
+fig = plot(df, x=:Year, y=:y, color=:Configuration, Geom.line,
     ymin=:ymin, ymax=:ymax, Geom.ribbon,
     Guide.ylabel("Discharge [m³/s]"))
 ```
