@@ -1,4 +1,4 @@
-using Documenter, ErrorsInVariablesExtremes
+using Documenter, ErrorsInVariablesExtremes, Extremes, DataFrames
 
 makedocs(sitename="ErrorsInVariablesExtremes.jl",
 		 pages = ["index.md",

@@ -1,15 +1,33 @@
 # Functions
 
-## Methods
+## Methods for Pseudodata
 
-```@autodocs
-Modules = [ErrorsInVariablesExtremes]
-Private = false
-Order = [:function]
-Pages = ["src/structures/pseudodata.jl",
-	"src/structures/pseudoensemble.jl",
-	"src/structures/pseudomaximaeva.jl"
-	]
+```@docs
+convert(::Type{DataFrame}, ::Vector{Pseudodata})
+ensemblemean(::Vector{Pseudodata})
+```
+
+## Parameter estimation
+
+```@docs
+fitbayes
+```
+
+## Methods for fitted models
+
+```@docs
+convert(::Type{MaximumLikelihoodEVA}, ::PseudoMaximaEVA, ::Int)
+dic
+```
+
+## Diagnostic plots
+
+```@docs
+diagnosticplots
+histplot
+probplot
+qqplot
+returnlevelplot
 ```
 
 ## Types
